@@ -14,7 +14,7 @@ namespace Oldtimer.Api.Validation
             RuleFor(sammler => sammler.Firstname)
                 .NotEmpty().WithMessage("Firstname is required.")
                 .MaximumLength(25).WithMessage("Firstname cannot exceed 25 characters.");
-
+ 
             RuleFor(sammler => sammler.Nickname)
                 .MaximumLength(25).WithMessage("Nickname cannot exceed 25 characters.");
 
