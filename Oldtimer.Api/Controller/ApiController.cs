@@ -16,8 +16,6 @@ namespace Oldtimer.Api.Controller
             _service = service;
         }
 
-        // Sammler-Endpunkte------------------------------------------------------------------------------------------
-
         [HttpGet("Sammler")]
         [SwaggerOperation("Get all Sammlers")]
         public IActionResult GetSammlers()
