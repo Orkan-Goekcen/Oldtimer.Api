@@ -1,5 +1,8 @@
 ﻿using Oldtimer.Api.Data;
+using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
+using System;
+using System.Collections.Generic;
 
 namespace Oldtimer.Api.Examples
 {
@@ -23,7 +26,6 @@ namespace Oldtimer.Api.Examples
             var car1 = new Car
             {
                 Id = 101,
-                Sammler = sammler,
                 Brand = "Porsche",
                 Model = "911",
                 LicensePlate = "PORSCH123",
@@ -34,7 +36,6 @@ namespace Oldtimer.Api.Examples
             var car2 = new Car
             {
                 Id = 102,
-                Sammler = sammler,
                 Brand = "Ford",
                 Model = "Mustang",
                 LicensePlate = "MUST123",

@@ -26,7 +26,7 @@ namespace Oldtimer.Api
             {
                 c.ExampleFilters();
             });
-
+            
             builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
             builder.Services.AddSingleton<OldTimerExample>();
             builder.Services.AddSingleton<IExamplesProvider<Sammler>, SammlerExample>();

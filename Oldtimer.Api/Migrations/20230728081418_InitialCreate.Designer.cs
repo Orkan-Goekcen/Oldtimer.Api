@@ -11,7 +11,7 @@ using Oldtimer.Api.Data;
 namespace Oldtimer.Api.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    [Migration("20230727113700_InitialCreate")]
+    [Migration("20230728081418_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

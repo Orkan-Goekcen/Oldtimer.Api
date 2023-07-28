@@ -1,4 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace Oldtimer.Api.Data
 {
@@ -29,92 +34,94 @@ namespace Oldtimer.Api.Data
 
             modelBuilder.Entity<Car>()
                 .HasKey(e => e.Id);
+
+            modelBuilder.Entity<Car>(b =>
+            {
+                b.Property<long?>("SammlerId").HasColumnType("INTEGER");
+                b.HasOne<Sammler>("Sammler")
+                    .WithMany("Cars")
+                    .HasForeignKey("SammlerId");
+            });
         }
 
         public void SeedInitialData()
         {
             Database.EnsureCreated();
 
-            if (Sammlers.Any())
+            if (!Sammlers.Any())
             {
-                Sammlers.RemoveRange(Sammlers);
-                SaveChanges();
+                var sammler1 = new Sammler
+                {
+                    Surname = "Smith",
+                    Firstname = "John",
+                    Nickname = "Johnny",
+                    Birthdate = new DateTime(1985, 5, 15),
+                    Email = "john.smith@example.com",
+                    Telephone = "+1 555-1234"
+                };
+
+                var sammler2 = new Sammler
+                {
+                    Surname = "Doe",
+                    Firstname = "Jane",
+                    Nickname = "Janey",
+                    Birthdate = new DateTime(1990, 8, 20),
+                    Email = "jane.doe@example.com",
+                    Telephone = "+1 555-5678"
+                };
+
+                Sammlers.AddRange(sammler1, sammler2);
             }
 
-            if (Cars.Any())
+            if (!Cars.Any())
             {
-                Cars.RemoveRange(Cars);
-                SaveChanges();
+                var sammler1 = Sammlers.First();
+                var sammler2 = Sammlers.Skip(1).First();
+
+                var car1 = new Car
+                {
+                    Brand = "Porsche",
+                    Model = "911",
+                    LicensePlate = "PORSCH123",
+                    YearOfConstruction = "1969",
+                    Colors = Car.Color.Red,
+                    Sammler = sammler1
+                };
+
+                var car2 = new Car
+                {
+                    Brand = "Ford",
+                    Model = "Mustang",
+                    LicensePlate = "MUST123",
+                    YearOfConstruction = "1970",
+                    Colors = Car.Color.Blue,
+                    Sammler = sammler1
+                };
+
+                var car3 = new Car
+                {
+                    Brand = "Volkswagen",
+                    Model = "Beetle",
+                    LicensePlate = "BEETL123",
+                    YearOfConstruction = "1965",
+                    Colors = Car.Color.Green,
+                    Sammler = sammler2
+                };
+
+                var car4 = new Car
+                {
+                    Brand = "Chevrolet",
+                    Model = "Camaro",
+                    LicensePlate = "CAMRO123",
+                    YearOfConstruction = "1972",
+                    Colors = Car.Color.Yellow,
+                    Sammler = sammler2
+                };
+
+                Cars.AddRange(car1, car2, car3, car4);
             }
 
-            // Seed data for Sammler entity
-            var sammler1 = new Sammler
-            {
-                Firstname = "Niklas",
-                Surname = "Mueller",
-                Nickname = "Nick",
-                Birthdate = new DateTime(1990, 1, 1),
-                Email = "muellerr@example.com",
-                Telephone = "1234214"
-            };
-
-            var sammler2 = new Sammler
-            {
-                Firstname = "Erkan",
-                Surname = "Manti",
-                Nickname = "Erkannicht",
-                Birthdate = new DateTime(1995, 1, 1),
-                Email = "erkan@example.com",
-                Telephone = "34241"
-            };
-
-            var sammler3 = new Sammler
-            {
-                Firstname = "Menschmann",
-                Surname = "Mustermann",
-                Nickname = "Mann",
-                Birthdate = new DateTime(1985, 1, 1),
-                Email = "mann@example.com",
-                Telephone = "5467654"
-            };
-
-            Sammlers.AddRange(sammler1, sammler2, sammler3);
-            SaveChanges();
-
-            // Seed data for Car entity
-            var car1 = new Car
-            {
-                Brand = "Volkswagen",
-                Model = "Beetle",
-                LicensePlate = "OLD123",
-                YearOfConstruction = "1965",
-                Colors = Car.Color.Red,
-                Sammler = sammler1
-            };
-
-            var car2 = new Car
-            {
-                Brand = "Ford",
-                Model = "Mustang",
-                LicensePlate = "OLD456",
-                YearOfConstruction = "1968",
-                Colors = Car.Color.Blue,
-                Sammler = sammler2
-            };
-
-            var car3 = new Car
-            {
-                Brand = "Porsche",
-                Model = "911",
-                LicensePlate = "OLD789",
-                YearOfConstruction = "1973",
-                Colors = Car.Color.Black,
-                Sammler = sammler3
-            };
-
-            Cars.AddRange(car1, car2, car3);
             SaveChanges();
         }
-
     }
 }
