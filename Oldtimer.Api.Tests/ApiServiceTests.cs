@@ -178,130 +178,123 @@ namespace Oldtimer.Api.Tests
         }
 
         [Fact]
+        public void Test_GetOldtimerPlusSammlerBySammlerId_ReturnsListOfCarsWithSammler()
+        {
+            // Arrange
+            long sammlerId = 1;
+            var mockApiService = Mocks.CreateMockApiService();
+            var apiService = mockApiService.Object;
+
+            // Act
+            var result = apiService.GetOldtimerPlusSammlerBySammlerId(sammlerId);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Single(result); // Es wird nur ein Auto mit der gegebenen SammlerId erwartet
+            Assert.Equal(sammlerId, result[0].Sammler.Id);
+            Assert.Equal("John", result[0].Sammler.Firstname);
+        }
+
+        [Fact]
         public void Test_GetAllOldtimer_ReturnsListOfCarsWithSammler()
         {
             // Arrange
-            var mockApiService = Mocks.CreateMockApiService(); // Step 2
-            var apiService = mockApiService.Object; // Step 3
+            var mockApiService = Mocks.CreateMockApiService();
+            var apiService = mockApiService.Object;
 
             // Act
             var result = apiService.GetAllOldtimer();
 
             // Assert
-            var carsList = Mocks.carsList; // Get the carsList directly from the Mocks class
             Assert.NotNull(result);
-            Assert.Equal(carsList.Count, result.Count);
+            Assert.Equal(Mocks.CarsList.Count, result.Count);
             foreach (var car in result)
             {
                 Assert.NotNull(car.Sammler);
             }
         }
 
-            [Fact]
-        public void Test_GetOldtimerPlusSammlerBySammlerId_ReturnsListOfCarsWithSammler()
+        [Fact]
+        public void Test_GetOldtimerBySammlerId_ReturnsListOfCarsWithoutSammler()
         {
             // Arrange
             long sammlerId = 1;
-            var mockContext = new Mock<YourDbContext>();
-            var carsList = new List<Car>
-            {
-                new Car { Id = 1, Brand = "Toyota", Model = "Supra", Sammler = new Sammler { Id = sammlerId, Firstname = "John" } },
-                new Car { Id = 2, Brand = "Ford", Model = "Mustang", Sammler = new Sammler { Id = 2, Firstname = "Jane" } }
-            };
-            mockContext.Setup(c => c.Cars.Include(c => c.Sammler)).Returns(carsList);
-            var repository = new SammlerRepository(mockContext.Object);
+            var mockApiService = Mocks.CreateMockApiService();
+            mockApiService.Setup(a => a.GetOldtimerPlusSammlerBySammlerId(sammlerId)).Returns(Mocks.CarsList.Where(c => c.Sammler.Id == sammlerId).ToList());
+            var apiService = mockApiService.Object;
 
             // Act
-            var result = repository.GetOldtimerPlusSammlerBySammlerId(sammlerId);
+            var result = apiService.GetOldtimerPlusSammlerBySammlerId(sammlerId);
 
             // Assert
             Assert.NotNull(result);
             Assert.Single(result);
-            Assert.Equal(sammlerId, result[0].Sammler.Id);
-            Assert.Equal("John", result[0].Sammler.Firstname);
+            Assert.Null(result[0].Sammler);
         }
 
-        //    [Fact]
-        //    public void Test_GetOldtimerBySammlerId_ReturnsListOfCarsWithoutSammler()
-        //    {
-        //        // Arrange
-        //        long sammlerId = 1;
-        //        var mockContext = new Mock<YourDbContext>();
-        //        var sammler = new Sammler { Id = sammlerId, Firstname = "John" };
-        //        var carsList = new List<Car>
-        //    {
-        //        new Car { Id = 1, Brand = "Toyota", Model = "Supra", Sammler = sammler },
-        //        new Car { Id = 2, Brand = "Ford", Model = "Mustang", Sammler = new Sammler { Id = 2, Firstname = "Jane" } }
-        //    };
-        //        mockContext.Setup(c => c.Cars.Where(c => c.Sammler.Id == sammlerId)).Returns(carsList.Where(c => c.Sammler.Id == sammlerId));
-        //        mockContext.Setup(c => c.Sammlers.FirstOrDefault(s => s.Id == sammlerId)).Returns(sammler);
-        //        var repository = new SammlerRepository(mockContext.Object);
 
-        //        // Act
-        //        var result = repository.GetOldtimerBySammlerId(sammlerId);
+        [Fact]
+        public void Test_GetSammlerByOldtimerBrandAndModel_ReturnsAllSammlersWhenBrandAndModelAreNullOrEmpty()
+        {
+            // Arrange
+            string brand = null;
+            string model = null;
 
-        //        // Assert
-        //        Assert.NotNull(result);
-        //        Assert.Single(result);
-        //        Assert.Null(result[0].Sammler);
-        //    }
+            // Erstelle den Mock ApiService
+            var mockApiService = Mocks.CreateMockApiService();
+            var apiService = mockApiService.Object;
 
-        //    [Fact]
-        //    public void Test_GetSammlerByOldtimerBrandAndModel_ReturnsAllSammlersWhenBrandAndModelAreNullOrEmpty()
-        //    {
-        //        // Arrange
-        //        string brand = null;
-        //        string model = null;
-        //        var mockContext = new Mock<YourDbContext>();
-        //        var sammlersList = new List<Sammler>
-        //    {
-        //        new Sammler { Id = 1, Firstname = "John" },
-        //        new Sammler { Id = 2, Firstname = "Jane" }
-        //    };
-        //        mockContext.Setup(c => c.Sammlers.ToList()).Returns(sammlersList);
-        //        var repository = new SammlerRepository(mockContext.Object);
+            // Definiere die erwarteten Ergebnisse
+            var expectedSammlersList = Mocks.SammlersList;
 
-        //        // Act
-        //        var result = repository.GetSammlerByOldtimerBrandAndModel(brand, model);
+            // Act
+            var result = apiService.GetSammlerByOldtimerBrandAndModel(brand, model);
 
-        //        // Assert
-        //        Assert.NotNull(result);
-        //        Assert.Equal(sammlersList.Count, result.Count);
-        //    }
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(expectedSammlersList.Count, result.Count);
+            for (int i = 0; i < expectedSammlersList.Count; i++)
+            {
+                Assert.Equal(expectedSammlersList[i].Id, result[i].Id);
+                Assert.Equal(expectedSammlersList[i].Firstname, result[i].Firstname);
+                // Weitere Eigenschaften für die Gleichheit überprüfen, falls notwendig
+            }
+        }
 
-        //    [Fact]
-        //    public void Test_GetSammlerByOldtimerBrandAndModel_ReturnsMatchingSammlers()
-        //    {
-        //        // Arrange
-        //        string brand = "Toyota";
-        //        string model = "Supra";
-        //        var mockContext = new Mock<YourDbContext>();
-        //        var sammlersList = new List<Sammler>
+
+        //[Fact]
+        //public void Test_GetSammlerByOldtimerBrandAndModel_ReturnsMatchingSammlers()
+        //{
+        //    // Arrange
+        //    string brand = "Toyota";
+        //    string model = "Supra";
+        //    var mockContext = new Mock<YourDbContext>();
+        //    var sammlersList = new List<Sammler>
         //    {
         //        new Sammler { Id = 1, Firstname = "John" },
         //        new Sammler { Id = 2, Firstname = "Jane" }
         //    };
-        //        var carsList = new List<Car>
+        //    var carsList = new List<Car>
         //    {
         //        new Car { Id = 1, Brand = "Toyota", Model = "Supra", Sammler = sammlersList[0] },
         //        new Car { Id = 2, Brand = "Ford", Model = "Mustang", Sammler = sammlersList[1] }
         //    };
-        //        sammlersList[0].Cars = new List<Car> { carsList[0] };
-        //        sammlersList[1].Cars = new List<Car> { carsList[1] };
-        //        mockContext.Setup(c => c.Sammlers).Returns(sammlersList);
-        //        mockContext.Setup(c => c.Cars).Returns(carsList);
-        //        var repository = new SammlerRepository(mockContext.Object);
+        //    sammlersList[0].Cars = new List<Car> { carsList[0] };
+        //    sammlersList[1].Cars = new List<Car> { carsList[1] };
+        //    mockContext.Setup(c => c.Sammlers).Returns(sammlersList);
+        //    mockContext.Setup(c => c.Cars).Returns(carsList);
+        //    var repository = new SammlerRepository(mockContext.Object);
 
-        //        // Act
-        //        var result = repository.GetSammlerByOldtimerBrandAndModel(brand, model);
+        //    // Act
+        //    var result = repository.GetSammlerByOldtimerBrandAndModel(brand, model);
 
-        //        // Assert
-        //        Assert.NotNull(result);
-        //        Assert.Single(result);
-        //        Assert.Equal(sammlersList[0].Id, result[0].Id);
-        //        Assert.Equal(sammlersList[0].Firstname, result[0].Firstname);
-        //        Assert.Empty(result[0].Cars); // Sammler doesn't have the Car anymore in the result
-        //    }
+        //    // Assert
+        //    Assert.NotNull(result);
+        //    Assert.Single(result);
+        //    Assert.Equal(sammlersList[0].Id, result[0].Id);
+        //    Assert.Equal(sammlersList[0].Firstname, result[0].Firstname);
+        //    Assert.Empty(result[0].Cars); // Sammler doesn't have the Car anymore in the result
+        //}
 
         //    [Fact]
         //    public void Test_AddOldtimerToSammler_AddsCarToSammler()
