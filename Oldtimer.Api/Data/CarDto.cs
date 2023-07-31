@@ -1,5 +1,4 @@
-﻿using Oldtimer.Api.Data;
-namespace Oldtimer.Api.Data
+﻿namespace Oldtimer.Api.Data
 {
     public class CarDto
     {
@@ -10,6 +9,4 @@ namespace Oldtimer.Api.Data
         public string YearOfConstruction { get; set; }
         public Car.Color Colors { get; set; }
     }
-
 }
-

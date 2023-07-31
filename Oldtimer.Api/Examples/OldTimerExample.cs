@@ -18,7 +18,7 @@ namespace Oldtimer.Api.Examples
                 Email = "john.smith@example.com",
                 Telephone = "+1 555-1234"
             };
-            
+
             // Example Car instance
             var car = new Car
             {

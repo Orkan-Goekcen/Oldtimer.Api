@@ -35,11 +35,14 @@ namespace Oldtimer.Api.Service
 
         public List<Sammler> GetSammlerBySurName(string surName)
         {
-            if (surName != null)
+            if (string.IsNullOrWhiteSpace(surName))
             {
-                return context.Sammlers.Where(n => n.Surname.Contains(surName, StringComparison.InvariantCultureIgnoreCase)).ToList();
+                return new List<Sammler>();
             }
-            return null;
+
+            return context.Sammlers
+                .Where(n => n.Surname.Contains(surName, StringComparison.InvariantCultureIgnoreCase))
+                .ToList();
         }
 
         public List<Sammler> GetSammlerByNickName(string nickName)
@@ -121,7 +124,7 @@ namespace Oldtimer.Api.Service
             var sammler = context.Sammlers.FirstOrDefault(s => s.Id == sammlerId);
             if (sammler == null)
             {
-                return null; 
+                return null;
             }
 
             var oldtimer = context.Cars
@@ -149,12 +152,12 @@ namespace Oldtimer.Api.Service
                 .ToList();
         }
 
-        public Car AddOldtimerToSammler(long sammlerId, CarDto carDto) 
+        public Car AddOldtimerToSammler(long sammlerId, CarDto carDto)
         {
             var sammler = context.Sammlers.FirstOrDefault(s => s.Id == sammlerId);
             if (sammler == null)
             {
-                return null; 
+                return null;
             }
 
             var car = new Car // Mapping von carDto und car
@@ -167,7 +170,7 @@ namespace Oldtimer.Api.Service
                 Sammler = sammler
             };
 
-            context.Cars.Add(car); 
+            context.Cars.Add(car);
             context.SaveChanges();
 
             return car;

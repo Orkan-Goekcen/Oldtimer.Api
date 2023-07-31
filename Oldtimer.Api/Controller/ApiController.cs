@@ -89,7 +89,6 @@ namespace Oldtimer.Api.Controller
             return Ok(existingSammler);
         }
 
-
         // Oldtimer-Endpunkte------------------------------------------------------------------------------------------
 
         [HttpGet("Oldtimer")]
@@ -130,7 +129,7 @@ namespace Oldtimer.Api.Controller
             return Ok(sammler);
         }
 
-        [HttpPost("Sammler/{id}/Oldtimer")] 
+        [HttpPost("Sammler/{id}/Oldtimer")]
         [SwaggerOperation("Add Oldtimer to Sammler")]
         public IActionResult AddOldtimerToSammler(long id, [FromBody] CarDto carDto)
         {
@@ -140,14 +139,10 @@ namespace Oldtimer.Api.Controller
                 return NotFound();
             }
 
-            var addedOldtimer = _service.AddOldtimerToSammler(id, carDto); 
+            var addedOldtimer = _service.AddOldtimerToSammler(id, carDto);
 
-            return Ok(addedOldtimer); 
+            return Ok(addedOldtimer);
         }
-
-
-
-
 
         [HttpDelete("Oldtimer/{id}")]
         [SwaggerOperation("Remove Oldtimer by ID")]

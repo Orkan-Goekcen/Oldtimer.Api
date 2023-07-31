@@ -1,8 +1,5 @@
 ﻿using Oldtimer.Api.Data;
-using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
-using System;
-using System.Collections.Generic;
 
 namespace Oldtimer.Api.Examples
 {

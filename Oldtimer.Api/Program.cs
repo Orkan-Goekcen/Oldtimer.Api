@@ -26,7 +26,7 @@ namespace Oldtimer.Api
             {
                 c.ExampleFilters();
             });
-            
+
             builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
             builder.Services.AddSingleton<OldTimerExample>();
             builder.Services.AddSingleton<IExamplesProvider<Sammler>, SammlerExample>();
@@ -41,7 +41,6 @@ namespace Oldtimer.Api
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
 
             if (app.Environment.IsDevelopment())
             {
@@ -60,7 +59,6 @@ namespace Oldtimer.Api
                     ctx.SeedInitialData();
                 }
             }
-
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
