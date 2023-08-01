@@ -99,11 +99,14 @@ namespace Oldtimer.Api.Service
 
         public bool SammlerVorhanden(Sammler neuerSammler)
         {
-            return context.Sammlers.Any(x => x.Firstname.Equals(neuerSammler.Firstname)
-            || (x.Nickname.Equals(neuerSammler.Nickname)
-            || (x.Telephone.Equals(neuerSammler.Telephone)
-            || (x.Surname.Equals(neuerSammler.Surname)))));
+            return context.Sammlers.Any(x =>
+                (x.Id != neuerSammler.Id) &&
+                (x.Firstname.Equals(neuerSammler.Firstname) ||
+                x.Nickname.Equals(neuerSammler.Nickname) ||
+                x.Telephone.Equals(neuerSammler.Telephone) ||
+                x.Surname.Equals(neuerSammler.Surname)));
         }
+
 
         public List<Car> GetAllOldtimer()
         {
@@ -112,10 +115,12 @@ namespace Oldtimer.Api.Service
                 .ToList();
         }
 
-        public static void SetupGetOldtimerPlusSammlerBySammlerId(Mock<IApiService> mockApiService, List<Car> carsList)
+        public List<Car> GetOldtimerPlusSammlerBySammlerId(long sammlerId)
         {
-            mockApiService.Setup(a => a.GetOldtimerPlusSammlerBySammlerId(It.IsAny<long>()))
-                          .Returns<long>(sammlerId => carsList.Where(c => c.Sammler != null && c.Sammler.Id == sammlerId).ToList());
+            return context.Cars
+                .Include(c => c.Sammler)
+                .Where(c => c.Sammler.Id == sammlerId)
+                .ToList();
         }
 
         public List<Car> GetOldtimerBySammlerId(long sammlerId)

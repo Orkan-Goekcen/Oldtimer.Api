@@ -7,6 +7,12 @@ using System.Collections.Generic;
 public class Mocks
 {
 
+    public static void SetupGetOldtimerPlusSammlerBySammlerId(Mock<IApiService> mockApiService, List<Car> carsList)
+    {
+        mockApiService.Setup(a => a.GetOldtimerPlusSammlerBySammlerId(It.IsAny<long>()))
+                      .Returns<long>(sammlerId => carsList.Where(c => c.Sammler != null && c.Sammler.Id == sammlerId).ToList());
+    }
+
     public static void SetupRemoveOldtimer(Mock<IApiService> mockApiService, List<Car> carsList)
     {
         mockApiService.Setup(a => a.RemoveOldtimer(It.IsAny<long>()))
@@ -19,6 +25,7 @@ public class Mocks
                 }
             });
     }
+
 
     public static List<Sammler> SammlersList { get; } = new List<Sammler>
     {

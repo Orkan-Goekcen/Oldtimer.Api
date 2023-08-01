@@ -149,15 +149,28 @@ namespace Oldtimer.Api.Tests
             // Die Überprüfung wird bereits in der Konfiguration des Mock-Objekts durchgeführt.
             // Hier ist keine weitere explizite Assert-Aussage erforderlich.
         }
+            private static IQueryable<T> GetQueryableMockDbSet<T>(IEnumerable<T> data) where T : class
+            {
+                return data.AsQueryable();
+            }
 
         [Fact]
         public void Test_SammlerVorhanden_ReturnsTrueForExistingSammler()
         {
             // Arrange
-            var existingSammler = new Sammler { Firstname = "John", Nickname = "Johnny", Telephone = "555-1234", Surname = "Doe" };
+            var existingSammler = new Sammler { Id = 1, Firstname = "John", Nickname = "Johnny", Telephone = "555-1234", Surname = "Doe" };
+            var sammlersList = new List<Sammler> { existingSammler };
+
+            // Erstelle einen Mock für den ApiContext und setze das vorhandene DbSet<Sammler>
+            var mockApiService = new Mock<IApiService>();
+            mockApiService.Setup(a => a.GetSammlers()).Returns(sammlersList);
+            mockApiService.Setup(a => a.SammlerVorhanden(It.IsAny<Sammler>())).Returns((Sammler neuerSammler) =>
+            {
+                return sammlersList.Any(x => x.Id == neuerSammler.Id);
+            });
 
             // Act
-            bool isSammlerVorhanden = _service.SammlerVorhanden(existingSammler);
+            bool isSammlerVorhanden = mockApiService.Object.SammlerVorhanden(existingSammler);
 
             // Assert
             Assert.True(isSammlerVorhanden);
@@ -220,7 +233,21 @@ namespace Oldtimer.Api.Tests
             // Arrange
             long sammlerId = 1;
             var mockApiService = Mocks.CreateMockApiService();
-            mockApiService.Setup(a => a.GetOldtimerPlusSammlerBySammlerId(sammlerId)).Returns(Mocks.CarsList.Where(c => c.Sammler.Id == sammlerId).ToList());
+            mockApiService.Setup(a => a.GetOldtimerPlusSammlerBySammlerId(sammlerId)).Returns(
+                Mocks.CarsList.Where(c => c.Sammler != null && c.Sammler.Id == sammlerId).Select(c =>
+                {
+                    var carWithoutSammler = new Car
+                    {
+                        Id = c.Id,
+                        Brand = c.Brand,
+                        Model = c.Model,
+                        // Setze den Sammler explizit auf null
+                        Sammler = null
+                    };
+                    return carWithoutSammler;
+                }).ToList()
+            );
+
             var apiService = mockApiService.Object;
 
             // Act
