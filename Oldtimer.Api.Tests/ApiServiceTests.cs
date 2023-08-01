@@ -161,7 +161,6 @@ namespace Oldtimer.Api.Tests
             var existingSammler = new Sammler { Id = 1, Firstname = "John", Nickname = "Johnny", Telephone = "555-1234", Surname = "Doe" };
             var sammlersList = new List<Sammler> { existingSammler };
 
-            // Erstelle einen Mock für den ApiContext und setze das vorhandene DbSet<Sammler>
             var mockApiService = new Mock<IApiService>();
             mockApiService.Setup(a => a.GetSammlers()).Returns(sammlersList);
             mockApiService.Setup(a => a.SammlerVorhanden(It.IsAny<Sammler>())).Returns((Sammler neuerSammler) =>
@@ -203,7 +202,7 @@ namespace Oldtimer.Api.Tests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Single(result); // Es wird nur ein Auto mit der gegebenen SammlerId erwartet
+            Assert.Single(result); 
             Assert.Equal(sammlerId, result[0].Sammler.Id);
             Assert.Equal("John", result[0].Sammler.Firstname);
         }
@@ -272,7 +271,6 @@ namespace Oldtimer.Api.Tests
             var mockSammlerRepository = new Mock<IApiService>();
             mockSammlerRepository.Setup(r => r.GetSammlerByOldtimerBrandAndModel(brand, model)).Returns(Mocks.SammlersList);
 
-            // Setze den Mock für GetSammlerByOldtimerBrandAndModel in den ApiService-Mock
             mockApiService.Setup(a => a.GetSammlerByOldtimerBrandAndModel(brand, model)).Returns(Mocks.SammlersList);
 
             // Act
@@ -295,16 +293,14 @@ namespace Oldtimer.Api.Tests
             string brand = "Toyota";
             string model = "Supra";
 
-            // Erstelle den Mock ApiService
+            // Act
             var mockApiService = Mocks.CreateMockApiService();
             var apiService = mockApiService.Object;
 
-            // Definiere die erwarteten Ergebnisse
             var expectedSammlersList = Mocks.SammlersList
                 .Where(s => s.Cars.Any(c => c.Brand == brand && c.Model == model))
                 .ToList();
 
-            // Act
             var result = apiService.GetSammlerByOldtimerBrandAndModel(brand, model);
 
             // Assert
@@ -348,7 +344,6 @@ namespace Oldtimer.Api.Tests
             Assert.Equal(carDto.Colors, addedCar.Colors);
             Assert.Equal(sammlerId, addedCar.Sammler.Id);
 
-            // Verify that the Add method was called with the expected carDto and sammlerId
             mockApiService.Verify(a => a.AddOldtimerToSammler(sammlerId, carDto), Times.Once);
         }
 
@@ -364,7 +359,6 @@ namespace Oldtimer.Api.Tests
             mockApiService.Object.RemoveOldtimer(oldtimerIdToRemove);
 
             // Assert
-            // Überprüfe, ob der gewünschte Oldtimer nicht mehr im Kontext vorhanden ist
             var removedCar = mockApiService.Object.GetOldtimerBySammlerId(oldtimerIdToRemove);
             Assert.Null(removedCar);
         }

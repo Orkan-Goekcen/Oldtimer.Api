@@ -91,6 +91,7 @@ namespace Oldtimer.Api.Tests
             Assert.IsType<ActionResult<Sammler>>(result);
             Assert.IsType<ConflictObjectResult>(result.Result); // Hier überprüfen wir den Typ des ActionResult.Result
         }
+
         // Test for DeleteSammler method with existing Sammler
         [Fact]
         public void Test_DeleteSammler_WithExistingSammler_ReturnsOkResult()
@@ -119,7 +120,7 @@ namespace Oldtimer.Api.Tests
             Assert.IsType<NotFoundResult>(result);
         }
 
-        //// Test for UpdateSammler method with existing Sammler
+        // Test for UpdateSammler method with existing Sammler
         [Fact]
         public void Test_UpdateSammler_WithExistingSammler_ReturnsOkResultWithUpdatedSammler()
         {
@@ -130,7 +131,7 @@ namespace Oldtimer.Api.Tests
                 Firstname = "UpdatedName",
                 Surname = "UpdatedSurname",
                 Nickname = "UpdatedNickname",
-                Birthdate = new DateTime(1990, 5, 10), 
+                Birthdate = new DateTime(1990, 5, 10),
                 Email = "updated@example.com",
                 Telephone = "555-5678"
             };
@@ -146,13 +147,12 @@ namespace Oldtimer.Api.Tests
             Assert.Equal("UpdatedName", updatedSammler.Firstname);
             Assert.Equal("UpdatedSurname", updatedSammler.Surname);
             Assert.Equal("UpdatedNickname", updatedSammler.Nickname);
-            Assert.Equal(new DateTime(1990, 5, 10), updatedSammler.Birthdate); 
+            Assert.Equal(new DateTime(1990, 5, 10), updatedSammler.Birthdate);
             Assert.Equal("updated@example.com", updatedSammler.Email);
             Assert.Equal("555-5678", updatedSammler.Telephone);
         }
 
-
-        //// Test for UpdateSammler method with non-existing Sammler
+        // Test for UpdateSammler method with non-existing Sammler
         [Fact]
         public void Test_UpdateSammler_WithNonExistingSammler_ReturnsNotFoundResult()
         {
@@ -175,7 +175,7 @@ namespace Oldtimer.Api.Tests
             Assert.IsType<NotFoundResult>(result);
         }
 
-        //// Test for GetAllOldtimer method
+        // Test for GetAllOldtimer method
         [Fact]
         public void Test_GetAllOldtimer_ReturnsOkResultWithListOfOldtimer()
         {
@@ -189,6 +189,6 @@ namespace Oldtimer.Api.Tests
             Assert.Equal(Mocks.CarsList.Count, (okResult.Value as List<Car>).Count);
         }
 
-        //// Other test methods can be similarly added for the remaining endpoints.
+        // Other test methods can be similarly added for the remaining endpoints.
     }
 }

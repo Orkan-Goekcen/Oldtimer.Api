@@ -93,7 +93,129 @@ namespace Oldtimer.Api.Tests
             // Assert
             result.ShouldHaveValidationErrorFor(c => c.Brand);
         }
+    }
+    public class SammlerValidatorTests
+    {
+        private readonly SammlerValidator _sammlerValidator;
 
-        // Other test methods can be similarly added to cover the remaining rules of CarDtoValidator.
+        public SammlerValidatorTests()
+        {
+            _sammlerValidator = new SammlerValidator();
+        }
+
+        [Fact]
+        public void Test_ValidSammler_PassesValidation()
+        {
+            // Arrange
+            var sammler = new Sammler
+            {
+                Surname = "Doe",
+                Firstname = "John",
+                Nickname = "JD",
+                Birthdate = new DateTime(1990, 1, 1),
+                Email = "john.doe@example.com",
+                Telephone = "123456"
+            };
+
+            // Act
+            var result = _sammlerValidator.TestValidate(sammler);
+
+            // Assert
+            result.ShouldNotHaveAnyValidationErrors();
+        }
+
+        [Theory]
+        [InlineData(null)] // Empty Surname
+        [InlineData("")] // Empty Firstname
+        [InlineData("2100-01-01")] // Future birthdate
+        [InlineData("invalid_email_format")] // Invalid email format
+        [InlineData("1234567890123456789012345678901234567890")] // Telephone exceeds 35 characters
+        public void Test_InvalidSammler_FailsValidation(string invalidValue)
+        {
+            // Arrange
+            var sammler = new Sammler
+            {
+                Surname = invalidValue,
+                Firstname = invalidValue,
+                Nickname = invalidValue,
+                Birthdate = DateTime.Parse(invalidValue),
+                Email = invalidValue,
+                Telephone = invalidValue
+            };
+
+            // Act
+            var result = _sammlerValidator.TestValidate(sammler);
+
+            // Assert
+            result.ShouldHaveValidationErrorFor(s => s.Surname);
+            result.ShouldHaveValidationErrorFor(s => s.Firstname);
+            result.ShouldHaveValidationErrorFor(s => s.Nickname);
+            result.ShouldHaveValidationErrorFor(s => s.Birthdate);
+            result.ShouldHaveValidationErrorFor(s => s.Email);
+            result.ShouldHaveValidationErrorFor(s => s.Telephone);
+        }
+
+        // You can add more test cases to cover other validation rules and scenarios.
+    }
+    public class SammlerUpdateDataValidatorTests
+    {
+        private readonly SammlerUpdateDataValidator _sammlerUpdateDataValidator;
+
+        public SammlerUpdateDataValidatorTests()
+        {
+            _sammlerUpdateDataValidator = new SammlerUpdateDataValidator();
+        }
+
+        [Fact]
+        public void Test_ValidSammlerUpdateData_PassesValidation()
+        {
+            // Arrange
+            var sammlerUpdateData = new SammlerUpdateData
+            {
+                Surname = "Doe",
+                Firstname = "John",
+                Nickname = "JD",
+                Birthdate = new DateTime(1990, 1, 1),
+                Email = "john.doe@example.com",
+                Telephone = "123456"
+            };
+
+            // Act
+            var result = _sammlerUpdateDataValidator.TestValidate(sammlerUpdateData);
+
+            // Assert
+            result.ShouldNotHaveAnyValidationErrors();
+        }
+
+        [Theory]
+        [InlineData("")] // Empty Surname
+        [InlineData("")] // Empty Firstname
+        [InlineData("2100-01-01")] // Future birthdate
+        [InlineData("invalid_email_format")] // Invalid email format
+        [InlineData("1234567890123456789012345678901234567890")] // Telephone exceeds 35 characters
+        public void Test_InvalidSammlerUpdateData_FailsValidation(string invalidValue)
+        {
+            // Arrange
+            var sammlerUpdateData = new SammlerUpdateData
+            {
+                Surname = invalidValue,
+                Firstname = invalidValue,
+                Nickname = invalidValue,
+                Birthdate = DateTime.TryParse("1990-01-01", out var birthdate) ? birthdate : DateTime.MinValue,
+                Email = invalidValue,
+                Telephone = invalidValue
+            };
+
+            // Act
+            var result = _sammlerUpdateDataValidator.TestValidate(sammlerUpdateData);
+
+            // Assert
+            result.ShouldHaveValidationErrorFor(s => s.Surname);
+            result.ShouldHaveValidationErrorFor(s => s.Firstname);
+            result.ShouldHaveValidationErrorFor(s => s.Nickname);
+            result.ShouldHaveValidationErrorFor(s => s.Birthdate);
+            result.ShouldHaveValidationErrorFor(s => s.Email);
+            result.ShouldHaveValidationErrorFor(s => s.Telephone);
+        }
     }
 }
