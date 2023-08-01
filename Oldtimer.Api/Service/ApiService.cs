@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Moq;
 using Oldtimer.Api.Data;
 
 namespace Oldtimer.Api.Service
@@ -111,12 +112,10 @@ namespace Oldtimer.Api.Service
                 .ToList();
         }
 
-        public List<Car> GetOldtimerPlusSammlerBySammlerId(long sammlerId)
+        public static void SetupGetOldtimerPlusSammlerBySammlerId(Mock<IApiService> mockApiService, List<Car> carsList)
         {
-            return context.Cars
-                .Include(c => c.Sammler)
-                .Where(c => c.Sammler.Id == sammlerId)
-                .ToList();
+            mockApiService.Setup(a => a.GetOldtimerPlusSammlerBySammlerId(It.IsAny<long>()))
+                          .Returns<long>(sammlerId => carsList.Where(c => c.Sammler != null && c.Sammler.Id == sammlerId).ToList());
         }
 
         public List<Car> GetOldtimerBySammlerId(long sammlerId)
@@ -144,7 +143,7 @@ namespace Oldtimer.Api.Service
         {
             if (string.IsNullOrWhiteSpace(brand) && string.IsNullOrWhiteSpace(model))
             {
-                return context.Sammlers.ToList();
+                return new List<Sammler>(); 
             }
 
             return context.Sammlers

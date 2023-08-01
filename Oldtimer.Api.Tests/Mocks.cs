@@ -1,52 +1,68 @@
 ﻿using Moq;
 using Oldtimer.Api.Data;
 using Oldtimer.Api.Service;
-using System.Drawing.Drawing2D;
+using System;
+using System.Collections.Generic;
 
 public class Mocks
 {
-    public static List<Sammler> SammlersList { get; } = new List<Sammler>
-{
-    new Sammler
-    {
-        Id = 1,
-        Firstname = "John",
-        Surname = "Doe",
-        Telephone = "555-1234"
-    },
-    new Sammler
-    {
-        Id = 2,
-        Firstname = "Jane",
-        Surname = "Smith",
-        Telephone = "555-5678"
-    }
-};
 
-    public static List<Car> CarsList { get; } = new List<Car>
-{
-    new Car
+    public static void SetupRemoveOldtimer(Mock<IApiService> mockApiService, List<Car> carsList)
     {
-        Id = 1, Brand = "Toyota",
-        Model = "Supra",
-        Sammler = new Sammler
+        mockApiService.Setup(a => a.RemoveOldtimer(It.IsAny<long>()))
+            .Callback<long>(oldtimerIdToRemove =>
+            {
+                var carToRemove = carsList.FirstOrDefault(c => c.Id == oldtimerIdToRemove);
+                if (carToRemove != null)
+                {
+                    carsList.Remove(carToRemove); // Entfernen des Cars aus der CarsList
+                }
+            });
+    }
+
+    public static List<Sammler> SammlersList { get; } = new List<Sammler>
+    {
+        new Sammler
         {
             Id = 1,
-            Firstname = "John"
-        }
-    },
-    new Car
-    {
-        Id = 2,
-        Brand = "Ford",
-        Model = "Mustang",
-        Sammler = new Sammler
+            Firstname = "John",
+            Surname = "Doe",
+            Telephone = "555-1234"
+        },
+        new Sammler
         {
             Id = 2,
-            Firstname = "Jane"
+            Firstname = "Jane",
+            Surname = "Smith",
+            Telephone = "555-5678"
         }
-    }
-};
+    };
+
+    public static List<Car> CarsList { get; } = new List<Car>
+    {
+        new Car
+        {
+            Id = 1,
+            Brand = "Toyota",
+            Model = "Supra",
+            Sammler = new Sammler
+            {
+                Id = 1,
+                Firstname = "John"
+            }
+        },
+        new Car
+        {
+            Id = 2,
+            Brand = "Ford",
+            Model = "Mustang",
+            Sammler = new Sammler
+            {
+                Id = 2,
+                Firstname = "Jane"
+            }
+        }
+    };
 
     public static Mock<IApiService> CreateMockApiService()
     {
@@ -81,6 +97,29 @@ public class Mocks
             return SammlersList.Where(s => s.Surname.Contains(surName, StringComparison.InvariantCultureIgnoreCase)).ToList();
         });
 
+        mockApiService.Setup(a => a.AddOldtimerToSammler(It.IsAny<long>(), It.IsAny<CarDto>()))
+    .Returns<long, CarDto>((sammlerId, carDto) =>
+    {
+        var sammler = SammlersList.FirstOrDefault(s => s.Id == sammlerId);
+        if (sammler == null)
+        {
+            return null;
+        }
+
+        var car = new Car
+        {
+            Brand = carDto.Brand,
+            Model = carDto.Model,
+            LicensePlate = carDto.LicensePlate,
+            YearOfConstruction = carDto.YearOfConstruction,
+            Colors = carDto.Colors,
+            Sammler = sammler
+        };
+
+        CarsList.Add(car); // Hinzufügen des neuen Cars zur CarsList
+        return car;
+    });
+
         mockApiService.Setup(a => a.AddSammler(It.IsAny<Sammler>()))
           .Returns<Sammler>(sammler => sammler);
 
@@ -90,14 +129,22 @@ public class Mocks
                mockApiService.Verify(a => a.DeleteSammler(sammlerId), Times.Once);
            });
 
-        mockApiService.Setup(a => a.UpdateSammler(It.IsAny<Sammler>())) 
+        mockApiService.Setup(a => a.UpdateSammler(It.IsAny<Sammler>()))
                       .Callback<Sammler>(updatedSammler =>
                       {
                           mockApiService.Verify(a => a.UpdateSammler(updatedSammler), Times.Once);
                       });
 
-        mockApiService.Setup(a => a.SammlerVorhanden(It.IsAny<Sammler>())).Returns(true);
-        mockApiService.Setup(a => a.SammlerVorhanden(It.IsAny<Sammler>())).Returns(false);
+        mockApiService.Setup(a => a.GetSammlerByOldtimerBrandAndModel(It.IsAny<string>(), It.IsAny<string>()))
+              .Returns<string, string>((brand, model) =>
+                  SammlersList
+                      .Where(s => s.Cars.Any(c => (string.IsNullOrEmpty(brand) || c.Brand.Equals(brand)) && (string.IsNullOrEmpty(model) || c.Model.Equals(model))))
+                      .ToList());
+
+        mockApiService.Setup(a => a.SammlerVorhanden(It.IsAny<Sammler>())).Returns((Sammler neuerSammler) =>
+        {
+            return SammlersList.Any(x => x.Id == neuerSammler.Id);
+        });
 
         // Mock die Methode GetAllOldtimer, damit sie die oben erstellte CarsList zurückgibt
         mockApiService.Setup(a => a.GetAllOldtimer()).Returns(CarsList);
