@@ -1,111 +1,194 @@
-//using System;
-//using System.Collections.Generic;
-//using Microsoft.AspNetCore.Mvc;
-//using Moq;
-//using Oldtimer.Api.Controller;
-//using Oldtimer.Api.Data;
-//using Oldtimer.Api.Service;
-//using Xunit;
+using Xunit;
+using Oldtimer.Api.Data;
+using Oldtimer.Api.Service;
+using Oldtimer.Api.Controller;
+using Microsoft.AspNetCore.Mvc;
 
-//namespace Oldtimer.Api.Tests
-//{
-//    public class ControllerTests
-//    {
-//        private readonly ApiController _controller;
-//        private readonly Mock<IApiService> _mockService;
+namespace Oldtimer.Api.Tests
+{
+    public class ApiControllerTests
+    {
+        private readonly ApiController _controller;
 
-//        public ControllerTests()
-//        {
-//            _mockService = new Mock<IApiService>();
-//            _controller = new ApiController(_mockService.Object);
-//        }
+        public ApiControllerTests()
+        {
+            var apiService = Mocks.CreateMockApiService().Object;
+            _controller = new ApiController(apiService);
+        }
 
-//        // Test for GetSammlers
-//        [Fact]
-//        public void GetSammlers_Should_Return_OkResult_With_Sammlers()
-//        {
-//            // Arrange
-//            var sammlers = new List<Sammler>
-//            {
-//                new Sammler { Id = 1, Firstname = "Max" },
-//                new Sammler { Id = 2, Firstname = "Anna" }
-//            };
-//            _mockService.Setup(s => s.GetSammlers()).Returns(sammlers);
+        // Test for GetSammlers method
+        [Fact]
+        public void Test_GetSammlers_ReturnsOkResultWithListOfSammlers()
+        {
+            // Act
+            var result = _controller.GetSammlers();
 
-//            // Act
-//            var result = _controller.GetSammlers();
+            // Assert
+            Assert.IsType<OkObjectResult>(result);
+            var okResult = result as OkObjectResult;
+            Assert.IsType<List<Sammler>>(okResult.Value);
+            Assert.Equal(Mocks.SammlersList.Count, (okResult.Value as List<Sammler>).Count);
+        }
 
-//            // Assert
-//            var okResult = Assert.IsType<OkObjectResult>(result);
-//            var model = Assert.IsAssignableFrom<IEnumerable<Sammler>>(okResult.Value);
-//            Assert.Equal(sammlers, model);
-//        }
+        // Test for GetSammlerById method with existing Sammler
+        [Fact]
+        public void Test_GetSammlerById_WithExistingSammler_ReturnsOkResultWithSammler()
+        {
+            // Arrange
+            long sammlerIdToFind = 1;
 
-//        // Test for GetSammlerById with a valid ID
-//        [Fact]
-//        public void GetSammlerById_Should_Return_OkResult_With_Sammler_When_ValidId()
-//        {
-//            // Arrange
-//            var sammlerId = 1;
-//            var sammler = new Sammler { Id = sammlerId, Firstname = "Max" };
-//            _mockService.Setup(s => s.GetSammlerById(sammlerId)).Returns(sammler);
+            // Act
+            var result = _controller.GetSammlerById(sammlerIdToFind);
 
-//            // Act
-//            var result = _controller.GetSammlerById(sammlerId);
+            // Assert
+            Assert.IsType<OkObjectResult>(result);
+            var okResult = result as OkObjectResult;
+            Assert.IsType<Sammler>(okResult.Value);
+            var sammler = okResult.Value as Sammler;
+            Assert.Equal("John", sammler.Firstname);
+        }
 
-//            // Assert
-//            var okResult = Assert.IsType<OkObjectResult>(result);
-//            var model = Assert.IsAssignableFrom<Sammler>(okResult.Value);
-//            Assert.Equal(sammler, model);
-//        }
+        // Test for GetSammlerById method with non-existing Sammler
+        [Fact]
+        public void Test_GetSammlerById_WithNonExistingSammler_ReturnsNotFoundResult()
+        {
+            // Arrange
+            long nonExistingSammlerId = 999;
 
-//        // Test for GetSammlerById with an invalid ID
-//        [Fact]
-//        public void GetSammlerById_Should_Return_NotFoundResult_When_InvalidId()
-//        {
-//            // Arrange
-//            var invalidId = 999; // Assume this ID is invalid and not present in the mocked data.
-//            _mockService.Setup(s => s.GetSammlerById(invalidId)).Returns((Sammler)null);
+            // Act
+            var result = _controller.GetSammlerById(nonExistingSammlerId);
 
-//            // Act
-//            var result = _controller.GetSammlerById(invalidId);
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
 
-//            // Assert
-//            var notFoundResult = Assert.IsType<NotFoundResult>(result);
-//        }
+        // Test for CreateSammler method with a new Sammler
+        [Fact]
+        public void Test_CreateSammler_WithNewSammler_ReturnsOkResult()
+        {
+            // Arrange
+            var newSammler = new Sammler { Id = 3, Firstname = "Alice", Surname = "Smith" };
 
-//        // Test for CreateSammler when Sammler already exists
-//        [Fact]
-//        public void CreateSammler_Should_Return_ConflictResult_When_Sammler_Already_Exists()
-//        {
-//            // Arrange
-//            var newSammler = new Sammler { Firstname = "Max" };
-//            _mockService.Setup(s => s.SammlerVorhanden(newSammler)).Returns(true);
+            // Act
+            var result = _controller.CreateSammler(newSammler);
 
-//            // Act
-//            var result = _controller.CreateSammler(newSammler);
+            // Assert
+            Assert.IsType<ActionResult<Sammler>>(result);
+            Assert.IsType<OkResult>(result.Result); // Hier überprüfen wir den Typ des ActionResult.Result
+        }
 
-//            // Assert
-//            var conflictResult = Assert.IsType<ActionResult<Sammler>>(result);
-//            Assert.Equal(newSammler, conflictResult.Value);
-//        }
+        // Test for CreateSammler method with an existing Sammler
+        [Fact]
+        public void Test_CreateSammler_WithExistingSammler_ReturnsConflictResult()
+        {
+            // Arrange
+            var existingSammler = new Sammler { Id = 1, Firstname = "John", Surname = "Doe" };
 
-//        // Test for CreateSammler when Sammler does not exist
-//        [Fact]
-//        public void CreateSammler_Should_Return_OkResult_When_Sammler_Does_Not_Exist()
-//        {
-//            // Arrange
-//            var newSammler = new Sammler { Firstname = "Max" };
-//            _mockService.Setup(s => s.SammlerVorhanden(newSammler)).Returns(false);
+            // Act
+            var result = _controller.CreateSammler(existingSammler);
 
-//            // Act
-//            var result = _controller.CreateSammler(newSammler);
+            // Assert
+            Assert.IsType<ActionResult<Sammler>>(result);
+            Assert.IsType<ConflictObjectResult>(result.Result); // Hier überprüfen wir den Typ des ActionResult.Result
+        }
+        // Test for DeleteSammler method with existing Sammler
+        [Fact]
+        public void Test_DeleteSammler_WithExistingSammler_ReturnsOkResult()
+        {
+            // Arrange
+            long existingSammlerId = 1;
 
-//            // Assert
-//            var okResult = Assert.IsType<OkResult>(result);
-//        }
+            // Act
+            var result = _controller.DeleteSammler(existingSammlerId);
 
-//        // Add more tests for other methods in the ApiController class...
+            // Assert
+            Assert.IsType<OkResult>(result);
+        }
 
-//    }
-//}
+        // Test for DeleteSammler method with non-existing Sammler
+        [Fact]
+        public void Test_DeleteSammler_WithNonExistingSammler_ReturnsNotFoundResult()
+        {
+            // Arrange
+            long nonExistingSammlerId = 999;
+
+            // Act
+            var result = _controller.DeleteSammler(nonExistingSammlerId);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        //// Test for UpdateSammler method with existing Sammler
+        [Fact]
+        public void Test_UpdateSammler_WithExistingSammler_ReturnsOkResultWithUpdatedSammler()
+        {
+            // Arrange
+            long existingSammlerId = 1;
+            var sammlerUpdate = new SammlerUpdateData
+            {
+                Firstname = "UpdatedName",
+                Surname = "UpdatedSurname",
+                Nickname = "UpdatedNickname",
+                Birthdate = new DateTime(1990, 5, 10), 
+                Email = "updated@example.com",
+                Telephone = "555-5678"
+            };
+
+            // Act
+            var result = _controller.UpdateSammler(existingSammlerId, sammlerUpdate);
+
+            // Assert
+            Assert.IsType<OkObjectResult>(result);
+            var okResult = result as OkObjectResult;
+            Assert.IsType<Sammler>(okResult.Value);
+            var updatedSammler = okResult.Value as Sammler;
+            Assert.Equal("UpdatedName", updatedSammler.Firstname);
+            Assert.Equal("UpdatedSurname", updatedSammler.Surname);
+            Assert.Equal("UpdatedNickname", updatedSammler.Nickname);
+            Assert.Equal(new DateTime(1990, 5, 10), updatedSammler.Birthdate); 
+            Assert.Equal("updated@example.com", updatedSammler.Email);
+            Assert.Equal("555-5678", updatedSammler.Telephone);
+        }
+
+
+        //// Test for UpdateSammler method with non-existing Sammler
+        [Fact]
+        public void Test_UpdateSammler_WithNonExistingSammler_ReturnsNotFoundResult()
+        {
+            // Arrange
+            long nonExistingSammlerId = 999;
+            var sammlerUpdate = new SammlerUpdateData
+            {
+                Firstname = "UpdatedName",
+                Surname = "UpdatedSurname",
+                Nickname = "UpdatedNickname",
+                Birthdate = new DateTime(1990, 5, 10),
+                Email = "updated@example.com",
+                Telephone = "555-5678"
+            };
+
+            // Act
+            var result = _controller.UpdateSammler(nonExistingSammlerId, sammlerUpdate);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        //// Test for GetAllOldtimer method
+        [Fact]
+        public void Test_GetAllOldtimer_ReturnsOkResultWithListOfOldtimer()
+        {
+            // Act
+            var result = _controller.GetAllOldtimer();
+
+            // Assert
+            Assert.IsType<OkObjectResult>(result);
+            var okResult = result as OkObjectResult;
+            Assert.IsType<List<Car>>(okResult.Value);
+            Assert.Equal(Mocks.CarsList.Count, (okResult.Value as List<Car>).Count);
+        }
+
+        //// Other test methods can be similarly added for the remaining endpoints.
+    }
+}
