@@ -8,6 +8,50 @@ namespace Oldtimer.Api.Tests
     public class CarValidatorTests
     {
         [Fact]
+        public void Test_CarValidator_BrandMaxLength_ReturnsNoValidationErrors()
+        {
+            // Arrange
+            var carValidator = new CarValidator();
+            var car = new Car
+            {
+                Brand = "T", 
+                Model = "Corolla",
+                LicensePlate = "ABC123",
+                YearOfConstruction = "1990",
+                Colors = Car.Color.Red,
+                Sammler = new Sammler { Id = 1, Firstname = "John", Surname = "Doe", Birthdate = DateTime.Today, Email = "dasdsadsa@sadad.com", Telephone = "2132123131321" }
+            };
+
+            // Act
+            var result = carValidator.TestValidate(car);
+
+            // Assert
+            result.ShouldNotHaveValidationErrorFor(c => c.Brand);
+        }
+
+        [Fact]
+        public void Test_CarValidator_BrandMaxLength_ReturnsValidationErrors()
+        {
+            // Arrange
+            var carValidator = new CarValidator();
+            var car = new Car
+            {
+                Brand = "ThisBrandNameIsVeryVeryLongAndExceedsTheMaximumAllowedLength", 
+                Model = "Corolla",
+                LicensePlate = "ABC123",
+                YearOfConstruction = "1990",
+                Colors = Car.Color.Red,
+                Sammler = new Sammler { Id = 1, Firstname = "John", Surname = "Doe", Birthdate = DateTime.Today, Email = "dasdsadsa@sadad.com", Telephone = "2132123131321" }
+            };
+
+            // Act
+            var result = carValidator.TestValidate(car);
+
+            // Assert
+            result.ShouldHaveValidationErrorFor(c => c.Brand);
+        }
+
+        [Fact]
         public void Test_CarValidator_ValidCar_ReturnsNoValidationErrors()
         {
             // Arrange
@@ -60,6 +104,49 @@ namespace Oldtimer.Api.Tests
     public class CarDtoValidatorTests
     {
         [Fact]
+        public void Test_CarDtoValidator_BrandMaxLength_ReturnsNoValidationErrors()
+        {
+            // Arrange
+            var carDtoValidator = new CarDtoValidator();
+            var carDto = new CarDto
+            {
+                Brand = "Toyota", // Brand is within the allowed MaxLength
+                Model = "Corolla",
+                LicensePlate = "ABC123",
+                YearOfConstruction = "1990",
+                Colors = Car.Color.Red
+            };
+
+            // Act
+            var result = carDtoValidator.TestValidate(carDto);
+
+            // Assert
+            result.ShouldNotHaveValidationErrorFor(c => c.Brand);
+        }
+
+        [Fact]
+        public void Test_CarDtoValidator_BrandMaxLength_ReturnsValidationErrors()
+        {
+            // Arrange
+            var carDtoValidator = new CarDtoValidator();
+            var carDto = new CarDto
+            {
+                Brand = "ThisBrandNameIsVeryVeryLongAndExceedsTheMaximumAllowedLength", // Brand is longer than MaxLength
+                Model = "Corolla",
+                LicensePlate = "ABC123",
+                YearOfConstruction = "1990",
+                Colors = Car.Color.Red
+            };
+
+            // Act
+            var result = carDtoValidator.TestValidate(carDto);
+
+            // Assert
+            result.ShouldHaveValidationErrorFor(c => c.Brand);
+        }
+
+
+        [Fact]
         public void Test_CarDtoValidator_ValidCarDto_ReturnsNoValidationError()
         {
             // Arrange
@@ -106,6 +193,50 @@ namespace Oldtimer.Api.Tests
         public SammlerValidatorTests()
         {
             _sammlerValidator = new SammlerValidator();
+        }
+
+        [Fact]
+        public void Test_SammlerValidator_Email_ValidFormat_ReturnsNoValidationErrors()
+        {
+            // Arrange
+            var sammlerValidator = new SammlerValidator();
+            var sammler = new Sammler
+            {
+                Surname = "Doe",
+                Firstname = "John",
+                Nickname = "JD",
+                Birthdate = new DateTime(1990, 1, 1),
+                Email = "john.doe@example.com", // Valid email format
+                Telephone = "123456"
+            };
+
+            // Act
+            var result = sammlerValidator.TestValidate(sammler);
+
+            // Assert
+            result.ShouldNotHaveValidationErrorFor(s => s.Email);
+        }
+
+        [Fact]
+        public void Test_SammlerValidator_Email_InvalidFormat_ReturnsValidationErrors()
+        {
+            // Arrange
+            var sammlerValidator = new SammlerValidator();
+            var sammler = new Sammler
+            {
+                Surname = "Doe",
+                Firstname = "John",
+                Nickname = "JD",
+                Birthdate = new DateTime(1990, 1, 1),
+                Email = "invalid_email_format", // Invalid email format
+                Telephone = "123456"
+            };
+
+            // Act
+            var result = sammlerValidator.TestValidate(sammler);
+
+            // Assert
+            result.ShouldHaveValidationErrorFor(s => s.Email);
         }
 
         [Fact]
@@ -164,6 +295,51 @@ namespace Oldtimer.Api.Tests
         {
             _sammlerUpdateDataValidator = new SammlerUpdateDataValidator();
         }
+
+        [Fact]
+        public void Test_SammlerUpdateDataValidator_Email_ValidFormat_ReturnsNoValidationErrors()
+        {
+            // Arrange
+            var sammlerUpdateDataValidator = new SammlerUpdateDataValidator();
+            var sammlerUpdateData = new SammlerUpdateData
+            {
+                Surname = "Doe",
+                Firstname = "John",
+                Nickname = "JD",
+                Birthdate = new DateTime(1990, 1, 1),
+                Email = "john.doe@example.com", // Valid email format
+                Telephone = "123456"
+            };
+
+            // Act
+            var result = sammlerUpdateDataValidator.TestValidate(sammlerUpdateData);
+
+            // Assert
+            result.ShouldNotHaveValidationErrorFor(s => s.Email);
+        }
+
+        [Fact]
+        public void Test_SammlerUpdateDataValidator_Email_InvalidFormat_ReturnsValidationErrors()
+        {
+            // Arrange
+            var sammlerUpdateDataValidator = new SammlerUpdateDataValidator();
+            var sammlerUpdateData = new SammlerUpdateData
+            {
+                Surname = "Doe",
+                Firstname = "John",
+                Nickname = "JD",
+                Birthdate = new DateTime(1990, 1, 1),
+                Email = "invalid_email_format", // Invalid email format
+                Telephone = "123456"
+            };
+
+            // Act
+            var result = sammlerUpdateDataValidator.TestValidate(sammlerUpdateData);
+
+            // Assert
+            result.ShouldHaveValidationErrorFor(s => s.Email);
+        }
+
 
         [Fact]
         public void Test_ValidSammlerUpdateData_PassesValidation()
