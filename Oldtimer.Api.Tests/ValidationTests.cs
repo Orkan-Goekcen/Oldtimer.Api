@@ -8,7 +8,7 @@ namespace Oldtimer.Api.Tests
     public class CarValidatorTests
     {
         [Fact]
-        public void Test_CarValidator_ValidCar_ReturnsNoValidationError()
+        public void Test_CarValidator_ValidCar_ReturnsNoValidationErrors()
         {
             // Arrange
             var carValidator = new CarValidator();
@@ -19,37 +19,42 @@ namespace Oldtimer.Api.Tests
                 LicensePlate = "ABC123",
                 YearOfConstruction = "1990",
                 Colors = Car.Color.Red,
-                Sammler = new Sammler { Id = 1, Firstname = "John", Surname = "Doe" }
+                Sammler = new Sammler { Id = 1, Firstname = "John", Surname = "Doe", Birthdate = DateTime.Today, Email = "dasdsadsa@sadad.com", Telephone = "2132123131321" }
             };
 
             // Act
             var result = carValidator.TestValidate(car);
 
             // Assert
-            result.ShouldNotHaveValidationErrorFor(c => c.Brand);
-            result.ShouldNotHaveValidationErrorFor(c => c.Model);
-            result.ShouldNotHaveValidationErrorFor(c => c.LicensePlate);
-            result.ShouldNotHaveValidationErrorFor(c => c.YearOfConstruction);
-            result.ShouldNotHaveValidationErrorFor(c => c.Colors);
-            result.ShouldNotHaveValidationErrorFor(c => c.Sammler);
+            result.ShouldNotHaveAnyValidationErrors();
         }
 
-        [Theory]
-        [InlineData("")] // Empty brand
-        public void Test_CarValidator_InvalidBrand_ReturnsValidationError(string brand)
+        [Fact]
+        public void Test_CarValidator_AllInvalidProperties_ReturnsValidationErrors()
         {
             // Arrange
             var carValidator = new CarValidator();
-            var car = new Car { Brand = brand };
+            var car = new Car
+            {
+                Brand = "",
+                Model = "",
+                LicensePlate = "",
+                YearOfConstruction = "",
+                Colors = (Car.Color)10,
+                Sammler = null
+            };
 
             // Act
             var result = carValidator.TestValidate(car);
 
             // Assert
             result.ShouldHaveValidationErrorFor(c => c.Brand);
+            result.ShouldHaveValidationErrorFor(c => c.Model);
+            result.ShouldHaveValidationErrorFor(c => c.LicensePlate);
+            result.ShouldHaveValidationErrorFor(c => c.YearOfConstruction);
+            result.ShouldHaveValidationErrorFor(c => c.Colors);
+            result.ShouldHaveValidationErrorFor(c => c.Sammler);
         }
-
-        // Other test methods can be similarly added to cover the remaining rules of CarValidator.
     }
 
     public class CarDtoValidatorTests
@@ -79,13 +84,12 @@ namespace Oldtimer.Api.Tests
             result.ShouldNotHaveValidationErrorFor(c => c.Colors);
         }
 
-        [Theory]
-        [InlineData("")] // Empty brand
-        public void Test_CarDtoValidator_InvalidBrand_ReturnsValidationError(string brand)
+        [Fact]
+        public void Test_CarDtoValidator_InvalidBrand_ReturnsValidationError()
         {
             // Arrange
             var carDtoValidator = new CarDtoValidator();
-            var carDto = new CarDto { Brand = brand };
+            var carDto = new CarDto { Brand = "" };
 
             // Act
             var result = carDtoValidator.TestValidate(carDto);
@@ -94,6 +98,7 @@ namespace Oldtimer.Api.Tests
             result.ShouldHaveValidationErrorFor(c => c.Brand);
         }
     }
+
     public class SammlerValidatorTests
     {
         private readonly SammlerValidator _sammlerValidator;
@@ -124,23 +129,18 @@ namespace Oldtimer.Api.Tests
             result.ShouldNotHaveAnyValidationErrors();
         }
 
-        [Theory]
-        [InlineData(null)] // Empty Surname
-        [InlineData("")] // Empty Firstname
-        [InlineData("2100-01-01")] // Future birthdate
-        [InlineData("invalid_email_format")] // Invalid email format
-        [InlineData("1234567890123456789012345678901234567890")] // Telephone exceeds 35 characters
-        public void Test_InvalidSammler_FailsValidation(string invalidValue)
+        [Fact]
+        public void Test_InvalidSammler_FailsValidation()
         {
             // Arrange
             var sammler = new Sammler
             {
-                Surname = invalidValue,
-                Firstname = invalidValue,
-                Nickname = invalidValue,
-                Birthdate = DateTime.Parse(invalidValue),
-                Email = invalidValue,
-                Telephone = invalidValue
+                Surname = null,
+                Firstname = "",
+                Nickname = "Nickname_With_More_Than_25_Characters_Here",
+                Birthdate = DateTime.Now.AddDays(1), // Set to a future date
+                Email = "invalid_email_format",
+                Telephone = "1234567890123456789012345678901234567890"
             };
 
             // Act
@@ -154,9 +154,8 @@ namespace Oldtimer.Api.Tests
             result.ShouldHaveValidationErrorFor(s => s.Email);
             result.ShouldHaveValidationErrorFor(s => s.Telephone);
         }
-
-        // You can add more test cases to cover other validation rules and scenarios.
     }
+
     public class SammlerUpdateDataValidatorTests
     {
         private readonly SammlerUpdateDataValidator _sammlerUpdateDataValidator;
@@ -187,23 +186,18 @@ namespace Oldtimer.Api.Tests
             result.ShouldNotHaveAnyValidationErrors();
         }
 
-        [Theory]
-        [InlineData("")] // Empty Surname
-        [InlineData("")] // Empty Firstname
-        [InlineData("2100-01-01")] // Future birthdate
-        [InlineData("invalid_email_format")] // Invalid email format
-        [InlineData("1234567890123456789012345678901234567890")] // Telephone exceeds 35 characters
-        public void Test_InvalidSammlerUpdateData_FailsValidation(string invalidValue)
+        [Fact]
+        public void Test_InvalidSammlerUpdateData_FailsValidation()
         {
             // Arrange
             var sammlerUpdateData = new SammlerUpdateData
             {
-                Surname = invalidValue,
-                Firstname = invalidValue,
-                Nickname = invalidValue,
-                Birthdate = DateTime.TryParse("1990-01-01", out var birthdate) ? birthdate : DateTime.MinValue,
-                Email = invalidValue,
-                Telephone = invalidValue
+                Surname = null,
+                Firstname = "",
+                Nickname = "Nickname_With_More_Than_25_Characters_Here",
+                Birthdate = DateTime.Now.AddDays(1), // Set to a future date
+                Email = "invalid_email_format",
+                Telephone = "1234567890123456789012345678901234567890"
             };
 
             // Act
@@ -217,5 +211,6 @@ namespace Oldtimer.Api.Tests
             result.ShouldHaveValidationErrorFor(s => s.Email);
             result.ShouldHaveValidationErrorFor(s => s.Telephone);
         }
+
     }
 }
