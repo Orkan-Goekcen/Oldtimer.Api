@@ -3,10 +3,10 @@ using Oldtimer.Api.Data;
 using Oldtimer.Api.Service;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class Mocks
 {
-
     public static void SetupGetOldtimerPlusSammlerBySammlerId(Mock<IApiService> mockApiService, List<Car> carsList)
     {
         mockApiService.Setup(a => a.GetOldtimerPlusSammlerBySammlerId(It.IsAny<long>()))
@@ -25,7 +25,6 @@ public class Mocks
                 }
             });
     }
-
 
     public static List<Sammler> SammlersList { get; } = new List<Sammler>
     {
@@ -123,7 +122,7 @@ public class Mocks
             Sammler = sammler
         };
 
-        CarsList.Add(car); // Hinzufügen des neuen Cars zur CarsList
+        CarsList.Add(car);
         return car;
     });
 
@@ -153,10 +152,8 @@ public class Mocks
             return SammlersList.Any(x => x.Id == neuerSammler.Id);
         });
 
-        // Mock die Methode GetAllOldtimer, damit sie die oben erstellte CarsList zurückgibt
         mockApiService.Setup(a => a.GetAllOldtimer()).Returns(CarsList);
 
-        // Mock die Methode GetOldtimerPlusSammlerBySammlerId, damit sie die Cars zurückgibt, die zum übergebenen Sammler gehören
         mockApiService.Setup(a => a.GetOldtimerPlusSammlerBySammlerId(It.IsAny<long>()))
                       .Returns<long>(sammlerId => CarsList.Where(c => c.Sammler.Id == sammlerId).ToList());
 

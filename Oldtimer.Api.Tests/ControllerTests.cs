@@ -189,6 +189,75 @@ namespace Oldtimer.Api.Tests
             Assert.Equal(Mocks.CarsList.Count, (okResult.Value as List<Car>).Count);
         }
 
-        // Other test methods can be similarly added for the remaining endpoints.
+        [Fact]
+        public void Test_GetSammlerById_WithInvalidId_ReturnsNotFoundResult()
+        {
+            // Arrange
+            long invalidSammlerId = -1;
+
+            // Act
+            var result = _controller.GetSammlerById(invalidSammlerId);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        // Test for GetSammlerById method with a valid Sammler ID but non-matching Sammler
+        [Fact]
+        public void Test_GetSammlerById_WithNonMatchingSammler_ReturnsNotFoundResult()
+        {
+            // Arrange
+            long sammlerIdToFind = 1;
+
+            // Act
+            var result = _controller.GetSammlerById(sammlerIdToFind + 1); // Using a non-matching ID
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public void Test_CreateSammler_WithExistingSammlerId_ReturnsConflictResult()
+        {
+            // Arrange
+            var existingSammler = new Sammler { Id = 1, Firstname = "John", Surname = "Doe" };
+
+            // Act
+            var result = _controller.CreateSammler(existingSammler);
+
+            // Assert
+            Assert.IsType<ActionResult<Sammler>>(result);
+            Assert.IsType<ConflictObjectResult>(result.Result);
+        }
+
+        [Fact]
+        public void Test_CreateSammler_WithEmptySammlerObject_ReturnsBadRequestResult()
+        {
+            // Arrange
+            Sammler invalidSammler = null;
+            var mockApiService = Mocks.CreateMockApiService(); 
+
+            var controller = new ApiController(mockApiService.Object); 
+
+            // Act
+            var result = controller.CreateSammler(invalidSammler);
+
+            // Assert
+            Assert.IsType<BadRequestResult>(result.Result);
+        }
+
+
+        [Fact]
+        public void Test_DeleteSammler_WithInvalidId_ReturnsNotFoundResult()
+        {
+            // Arrange
+            long invalidSammlerId = -1;
+
+            // Act
+            var result = _controller.DeleteSammler(invalidSammlerId);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
     }
 }

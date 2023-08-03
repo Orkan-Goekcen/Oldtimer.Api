@@ -66,8 +66,12 @@ namespace Oldtimer.Api.Service
 
         public Sammler AddSammler(Sammler sammler)
         {
-            context.Sammlers.Add(sammler);
-            context.SaveChanges();
+            if (sammler != null)
+            {
+                context.Sammlers.Add(sammler);
+                context.SaveChanges();
+                return sammler;
+            }
             return sammler;
         }
 

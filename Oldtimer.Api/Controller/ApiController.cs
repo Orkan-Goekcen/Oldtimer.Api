@@ -41,6 +41,11 @@ namespace Oldtimer.Api.Controller
         [SwaggerOperation("Create Sammler")]
         public ActionResult<Sammler> CreateSammler([FromBody] Sammler neuerSammler)
         {
+            if (neuerSammler == null || !ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
             var sammlerBereitsVorhanden = _service.SammlerVorhanden(neuerSammler);
 
             if (sammlerBereitsVorhanden)
