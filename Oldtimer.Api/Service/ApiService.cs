@@ -19,6 +19,7 @@ namespace Oldtimer.Api.Service
                 .FirstOrDefault(sammler => sammler.Id == id);
         }
 
+
         public List<Sammler> GetSammlers()
         {
             return context.Sammlers
@@ -121,10 +122,12 @@ namespace Oldtimer.Api.Service
 
         public List<Car> GetOldtimerPlusSammlerBySammlerId(long sammlerId)
         {
-            return context.Cars
+            var getSammlerId = context.Cars
                 .Include(c => c.Sammler)
                 .Where(c => c.Sammler.Id == sammlerId)
                 .ToList();
+
+            return getSammlerId;
         }
 
         public List<Car> GetOldtimerBySammlerId(long sammlerId)
@@ -139,20 +142,15 @@ namespace Oldtimer.Api.Service
                 .Where(c => c.Sammler.Id == sammlerId)
                 .ToList();
 
-            // damit im Response Body nicht jedes mal der Sammler aufgezählt wird
-            foreach (var car in oldtimer)
-            {
-                car.Sammler = null;
-            }
-
             return oldtimer;
+            //TODO: Man kriegt auch jedes mal den Sammler, Vielleicht schauen ob man das auf 1 mal reduzieren könnte oder komplett raus lassen könnte
         }
 
         public List<Sammler> GetSammlerByOldtimerBrandAndModel(string? brand, string? model)
         {
             if (string.IsNullOrWhiteSpace(brand) && string.IsNullOrWhiteSpace(model))
             {
-                return new List<Sammler>(); 
+                return new List<Sammler>();
             }
 
             return context.Sammlers
