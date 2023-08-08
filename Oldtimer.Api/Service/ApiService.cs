@@ -143,7 +143,6 @@ namespace Oldtimer.Api.Service
                 .ToList();
 
             return oldtimer;
-            //TODO: Man kriegt auch jedes mal den Sammler, Vielleicht schauen ob man das auf 1 mal reduzieren könnte oder komplett raus lassen könnte
         }
 
         public List<Sammler> GetSammlerByOldtimerBrandAndModel(string? brand, string? model)
