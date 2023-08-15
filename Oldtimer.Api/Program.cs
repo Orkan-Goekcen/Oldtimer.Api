@@ -4,7 +4,6 @@ using Oldtimer.Api.Commands;
 using Oldtimer.Api.Data;
 using Oldtimer.Api.Examples;
 using Oldtimer.Api.Queries;
-using Oldtimer.Api.Service;
 using Swashbuckle.AspNetCore.Filters;
 
 namespace Oldtimer.Api

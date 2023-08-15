@@ -20,7 +20,7 @@ namespace Oldtimer.Api.Queries
         }
 
         public async Task<Sammler> Handle(GetSammlerByIdQuery request, CancellationToken cancellationToken)
-        {
+        {   
             var result = await context.FindAsync<Sammler>(request.SammlerId);
 
             return result;

@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Oldtimer.Api.Data;
 using Oldtimer.Api.Queries;
-using Oldtimer.Api.Service;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Oldtimer.Api.Controller
@@ -10,19 +9,14 @@ namespace Oldtimer.Api.Controller
     [ApiController]
     [Route("api")]
     public class ApiController : ControllerBase
-    {
-        private readonly IApiService _service;
-
-        public ApiController(IApiService service)
-        {
-            _service = service;
-        }
-
+    {   
         [HttpGet("Sammler")]
         [SwaggerOperation("Get all Sammlers")]
         public IActionResult GetSammlers()
         {
-            var sammlers = _service.GetSammlers();
+            var query = new GetSammlersQuery();
+            var oldtimer = await mediator.Send(query);
+
             return Ok(sammlers);
         }
 
