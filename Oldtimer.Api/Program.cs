@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Oldtimer.Api.Commands;
 using Oldtimer.Api.Data;
 using Oldtimer.Api.Examples;
 using Oldtimer.Api.Queries;
@@ -17,7 +18,7 @@ namespace Oldtimer.Api
             // Add services to the container.
             builder.Services.AddRazorPages();
 
-            builder.Services.AddScoped<IApiService, ApiService>();
+            //builder.Services.AddScoped<IApiService, ApiService>();
 
             builder.Services.AddDbContext<ApiContext>();
 
@@ -38,7 +39,12 @@ namespace Oldtimer.Api
                 cfg.RegisterServicesFromAssembly(typeof(GetSammlerByIdQuery).Assembly);
                 cfg.RegisterServicesFromAssembly(typeof(GetSammlersQuery).Assembly);
                 cfg.RegisterServicesFromAssembly(typeof(GetSammlerByFirstNameQuery).Assembly);
-                cfg.RegisterServicesFromAssembly(typeof(GetSammlerByFirstNameQuery).Assembly);
+                cfg.RegisterServicesFromAssembly(typeof(GetSammlerBySurNameQuery).Assembly);
+                cfg.RegisterServicesFromAssembly(typeof(GetSammlerByNickNameQuery).Assembly);
+                cfg.RegisterServicesFromAssembly(typeof(GetSammlerByTelephoneQuery).Assembly);
+                cfg.RegisterServicesFromAssembly(typeof(AddSammlerCommand).Assembly);
+                cfg.RegisterServicesFromAssembly(typeof(DeleteSammlerCommand).Assembly);
+
             });
             var app = builder.Build();
 

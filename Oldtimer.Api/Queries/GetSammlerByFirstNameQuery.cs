@@ -24,13 +24,13 @@ namespace Oldtimer.Api.Queries
 
         public async Task<List<Sammler>> Handle(GetSammlerByFirstNameQuery request, CancellationToken cancellationToken)
         {
-            if (request.FirstName != null)
+            if (!string.IsNullOrEmpty(request.FirstName))
             {
                 return await context.Sammlers
                     .Where(n => n.Firstname.Contains(request.FirstName, StringComparison.InvariantCultureIgnoreCase))
                     .ToListAsync(cancellationToken);
             }
-            return null;
+            return new List<Sammler>();
         }
     }
 }
