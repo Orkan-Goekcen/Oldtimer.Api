@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Oldtimer.Api.Data;
+using Oldtimer.Api.Queries;
 using Oldtimer.Api.Service;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -26,9 +28,11 @@ namespace Oldtimer.Api.Controller
 
         [HttpGet("Sammler/{id}")]
         [SwaggerOperation("Get Sammler by ID")]
-        public IActionResult GetSammlerById(long id)
+        public async Task<IActionResult> GetSammlerById(long id, [FromServices] IMediator mediator)
         {
-            var sammler = _service.GetSammlerById(id);
+            var query = new GetSammlerByIdQuery { SammlerId = id };
+            var sammler = await mediator.Send(query);
+
             if (sammler == null)
             {
                 return NotFound();
@@ -37,11 +41,14 @@ namespace Oldtimer.Api.Controller
             return Ok(sammler);
         }
 
+
         [HttpGet("Sammler/{id}/Details")]
         [SwaggerOperation("Get Sammler Details by ID")]
-        public IActionResult GetSammlerDetails(long id)
+        public async Task<IActionResult> GetSammlerDetails(long id, [FromServices] IMediator mediator)
         {
-            var sammler = _service.GetSammlerById(id);
+            var query = new GetSammlerByIdQuery { SammlerId = id };
+            var sammler = await mediator.Send(query);
+
             if (sammler == null)
             {
                 return NotFound();
@@ -88,9 +95,11 @@ namespace Oldtimer.Api.Controller
 
         [HttpDelete("Sammler/{id}")]
         [SwaggerOperation("Delete Sammler by ID")]
-        public IActionResult DeleteSammler(long id)
+        public async Task<IActionResult> DeleteSammler(long id, [FromServices] IMediator mediator)
         {
-            var sammler = _service.GetSammlerById(id);
+            var query = new GetSammlerByIdQuery { SammlerId = id };
+            var sammler = await mediator.Send(query);
+
             if (sammler == null)
             {
                 return NotFound();
@@ -101,24 +110,29 @@ namespace Oldtimer.Api.Controller
 
         [HttpPut("Sammler/{id}")]
         [SwaggerOperation("Update Sammler by ID")]
-        public IActionResult UpdateSammler(long id, [FromBody] SammlerUpdateData sammlerUpdate)
+        public async Task<IActionResult> UpdateSammler(long id, 
+            [FromBody] SammlerUpdateData sammlerUpdate, 
+            [FromServices] IMediator mediator)
+
         {
-            var existingSammler = _service.GetSammlerById(id);
-            if (existingSammler == null)
+            var query = new GetSammlerByIdQuery { SammlerId = id };
+            var sammler = await mediator.Send(query);
+
+            if (sammler == null)
             {
                 return NotFound();
             }
 
             // Mapping von Sammler und SammlerUpdateModel
-            existingSammler.Surname = sammlerUpdate.Surname;
-            existingSammler.Firstname = sammlerUpdate.Firstname;
-            existingSammler.Nickname = sammlerUpdate.Nickname;
-            existingSammler.Birthdate = sammlerUpdate.Birthdate;
-            existingSammler.Email = sammlerUpdate.Email;
-            existingSammler.Telephone = sammlerUpdate.Telephone;
+            sammler.Surname = sammlerUpdate.Surname;
+            sammler.Firstname = sammlerUpdate.Firstname;
+            sammler.Nickname = sammlerUpdate.Nickname;
+            sammler.Birthdate = sammlerUpdate.Birthdate;
+            sammler.Email = sammlerUpdate.Email;
+            sammler.Telephone = sammlerUpdate.Telephone;
 
-            _service.UpdateSammler(existingSammler);
-            return Ok(existingSammler);
+            _service.UpdateSammler(sammler);
+            return Ok(sammler);
         }
 
 
@@ -176,9 +190,11 @@ namespace Oldtimer.Api.Controller
 
         [HttpPost("Sammler/{id}/Oldtimer")]
         [SwaggerOperation("Add Oldtimer to Sammler")]
-        public IActionResult AddOldtimerToSammler(long id, [FromBody] CarDto carDto)
+        public async Task<IActionResult> AddOldtimerToSammler(long id, [FromBody] CarDto carDto, [FromServices] IMediator mediator)
         {
-            var sammler = _service.GetSammlerById(id);
+            var query = new GetSammlerByIdQuery { SammlerId = id };
+            var sammler = await mediator.Send(query);
+
             if (sammler == null)
             {
                 return NotFound();

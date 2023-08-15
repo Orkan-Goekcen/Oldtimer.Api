@@ -1,6 +1,8 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Oldtimer.Api.Data;
 using Oldtimer.Api.Examples;
+using Oldtimer.Api.Queries;
 using Oldtimer.Api.Service;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -32,6 +34,10 @@ namespace Oldtimer.Api
             builder.Services.AddSingleton<IExamplesProvider<Sammler>, SammlerExample>();
             builder.Services.AddSingleton<Sammler>();
 
+            builder.Services.AddMediatR(cfg => {
+                cfg.RegisterServicesFromAssembly(typeof(GetSammlerByIdQuery).Assembly);
+                cfg.RegisterServicesFromAssembly(typeof(GetSammlersQuery).Assembly);
+            });
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -41,6 +47,7 @@ namespace Oldtimer.Api
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
 
             if (app.Environment.IsDevelopment())
             {

@@ -19,8 +19,6 @@ namespace Oldtimer.Api.Service
 
         List<Sammler> GetSammlerByFirstName(string firstName);
 
-        Sammler GetSammlerById(long id);
-
         List<Sammler> GetSammlerByNickName(string nickName);
 
         List<Sammler> GetSammlerByOldtimerBrandAndModel(string brand, string model);

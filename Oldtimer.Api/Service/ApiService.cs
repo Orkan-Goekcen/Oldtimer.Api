@@ -13,18 +13,18 @@ namespace Oldtimer.Api.Service
             this.context = context;
         }
 
-        public Sammler GetSammlerById(long id)
-        {
-            return context.Sammlers
-                .FirstOrDefault(sammler => sammler.Id == id);
-        }
+        //public Sammler GetSammlerById(long id)
+        //{
+        //    return context.Sammlers
+        //        .FirstOrDefault(sammler => sammler.Id == id);
+        //}
 
 
-        public List<Sammler> GetSammlers()
-        {
-            return context.Sammlers
-                .ToList();
-        }
+        //public List<Sammler> GetSammlers()
+        //{
+        //    return context.Sammlers
+        //        .ToList();
+        //}
 
         public List<Sammler> GetSammlerByFirstName(string firstName)
         {
