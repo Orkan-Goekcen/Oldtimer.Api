@@ -113,82 +113,84 @@
 //        }
 
 
-//        public List<Car> GetAllOldtimer()
-//        {
-//            return context.Cars
-//                .Include(c => c.Sammler)
-//                .ToList();
-//        }
-
-//        public List<Car> GetOldtimerPlusSammlerBySammlerId(long sammlerId)
-//        {
-//            var getSammlerId = context.Cars
-//                .Include(c => c.Sammler)
-//                .Where(c => c.Sammler.Id == sammlerId)
-//                .ToList();
-
-//            return getSammlerId;
-//        }
-
-//        public List<Car> GetOldtimerBySammlerId(long sammlerId)
-//        {
-//            var sammler = context.Sammlers.FirstOrDefault(s => s.Id == sammlerId);
-//            if (sammler == null)
-//            {
-//                return null;
-//            }
-
-//            var oldtimer = context.Cars
-//                .Where(c => c.Sammler.Id == sammlerId)
-//                .ToList();
-
-//            return oldtimer;
-//        }
-
-//        public List<Sammler> GetSammlerByOldtimerBrandAndModel(string? brand, string? model)
-//        {
-//            if (string.IsNullOrWhiteSpace(brand) && string.IsNullOrWhiteSpace(model))
-//            {
-//                return new List<Sammler>();
-//            }
-
-//            return context.Sammlers
-//                .Where(s => s.Cars.Any(c => (string.IsNullOrEmpty(brand) || c.Brand.Equals(brand)) && (string.IsNullOrEmpty(model) || c.Model.Equals(model))))
-//                .ToList();
-//        }
-
-//        public Car AddOldtimerToSammler(long sammlerId, CarDto carDto)
-//        {
-//            var sammler = context.Sammlers.FirstOrDefault(s => s.Id == sammlerId);
-//            if (sammler == null)
-//            {
-//                return null;
-//            }
-
-//            var car = new Car // Mapping von carDto und car
-//            {
-//                Brand = carDto.Brand,
-//                Model = carDto.Model,
-//                LicensePlate = carDto.LicensePlate,
-//                YearOfConstruction = carDto.YearOfConstruction,
-//                Colors = carDto.Colors,
-//                Sammler = sammler
-//            };
-
-//            context.Cars.Add(car);
-//            context.SaveChanges();
-
-//            return car;
-//        }
-
-//        public void RemoveOldtimer(long oldtimerId)
-//        {
-//            var oldtimer = context.Cars.FirstOrDefault(c => c.Id == oldtimerId);
-//            if (oldtimer != null)
-//            {
-//                context.Cars.Remove(oldtimer);
-//                context.SaveChanges();
-//            }
-//        }
-//    }
+//public List<Car> GetAllOldtimer()
+//{
+//    return context.Cars
+//        .Include(c => c.Sammler)
+//        .ToList();
 //}
+
+//public List<Car> GetOldtimerPlusSammlerBySammlerId(long sammlerId)
+//{
+//    var getSammlerId = context.Cars
+//        .Include(c => c.Sammler)
+//        .Where(c => c.Sammler.Id == sammlerId)
+//        .ToList();
+
+//    return getSammlerId;
+//}
+
+//public List<Car> GetOldtimerBySammlerId(long sammlerId)
+//{
+//    var sammler = context.Sammlers.FirstOrDefault(s => s.Id == sammlerId);
+//    if (sammler == null)
+//    {
+//        return null;
+//    }
+
+//    var oldtimer = context.Cars
+//        .Where(c => c.Sammler.Id == sammlerId)
+//        .ToList();
+
+//    return oldtimer;
+//}
+
+public List<Sammler> GetSammlerByOldtimerBrandAndModel(string? brand, string? model)
+{
+    if (string.IsNullOrWhiteSpace(brand) && string.IsNullOrWhiteSpace(model))
+    {
+        return new List<Sammler>();
+    }
+
+    return context.Sammlers
+        .Where(s => s.Cars.Any(c => (string.IsNullOrEmpty(brand) || c.Brand.Equals(brand)) && (string.IsNullOrEmpty(model) || c.Model.Equals(model))))
+        .ToList();
+}
+
+public Car AddOldtimerToSammler(long sammlerId, CarDto carDto)
+{
+    var sammler = context.Sammlers.FirstOrDefault(s => s.Id == sammlerId);
+    if (sammler == null)
+    {
+        return null;
+    }
+
+    var car = new Car // Mapping von carDto und car
+    {
+        Brand = carDto.Brand,
+        Model = carDto.Model,
+        LicensePlate = carDto.LicensePlate,
+        YearOfConstruction = carDto.YearOfConstruction,
+        Colors = carDto.Colors,
+        Sammler = sammler
+    };
+
+    context.Cars.Add(car);
+    context.SaveChanges();
+
+    return car;
+}
+
+public void RemoveOldtimer(long oldtimerId)
+{
+    var oldtimer = context.Cars.FirstOrDefault(c => c.Id == oldtimerId);
+    if (oldtimer != null)
+    {
+        context.Cars.Remove(oldtimer);
+        context.SaveChanges();
+    }
+}
+    }
+}
+
+//todo: oldtimer vergessen zu queryen #upssie

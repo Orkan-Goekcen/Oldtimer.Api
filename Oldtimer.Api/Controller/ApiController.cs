@@ -9,20 +9,28 @@ namespace Oldtimer.Api.Controller
     [ApiController]
     [Route("api")]
     public class ApiController : ControllerBase
-    {   
+    {
+        private readonly IMediator mediator;
+
+        public ApiController(IMediator mediator)
+        {
+            this.mediator = mediator;
+        }
+
         [HttpGet("Sammler")]
         [SwaggerOperation("Get all Sammlers")]
-        public IActionResult GetSammlers()
+        public async Task<IActionResult> GetSammlers()
         {
-            var query = new GetSammlersQuery();
-            var oldtimer = await mediator.Send(query);
+            var query = new GetSammlersQuery { };
+            var sammler = await mediator.Send(query);
 
-            return Ok(sammlers);
+
+            return Ok(sammler);
         }
 
         [HttpGet("Sammler/{id}")]
         [SwaggerOperation("Get Sammler by ID")]
-        public async Task<IActionResult> GetSammlerById(long id, [FromServices] IMediator mediator)
+        public async Task<IActionResult> GetSammlerById(long id)
         {
             var query = new GetSammlerByIdQuery { SammlerId = id };
             var sammler = await mediator.Send(query);
@@ -38,7 +46,7 @@ namespace Oldtimer.Api.Controller
 
         [HttpGet("Sammler/{id}/Details")]
         [SwaggerOperation("Get Sammler Details by ID")]
-        public async Task<IActionResult> GetSammlerDetails(long id, [FromServices] IMediator mediator)
+        public async Task<IActionResult> GetSammlerDetails(long id)
         {
             var query = new GetSammlerByIdQuery { SammlerId = id };
             var sammler = await mediator.Send(query);
@@ -89,7 +97,7 @@ namespace Oldtimer.Api.Controller
 
         [HttpDelete("Sammler/{id}")]
         [SwaggerOperation("Delete Sammler by ID")]
-        public async Task<IActionResult> DeleteSammler(long id, [FromServices] IMediator mediator)
+        public async Task<IActionResult> DeleteSammler(long id)
         {
             var query = new GetSammlerByIdQuery { SammlerId = id };
             var sammler = await mediator.Send(query);
@@ -184,7 +192,7 @@ namespace Oldtimer.Api.Controller
 
         [HttpPost("Sammler/{id}/Oldtimer")]
         [SwaggerOperation("Add Oldtimer to Sammler")]
-        public async Task<IActionResult> AddOldtimerToSammler(long id, [FromBody] CarDto carDto, [FromServices] IMediator mediator)
+        public async Task<IActionResult> AddOldtimerToSammler(long id, [FromBody] CarDto carDto)
         {
             var query = new GetSammlerByIdQuery { SammlerId = id };
             var sammler = await mediator.Send(query);
