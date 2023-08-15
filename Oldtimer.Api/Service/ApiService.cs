@@ -26,26 +26,26 @@ namespace Oldtimer.Api.Service
         //        .ToList();
         //}
 
-        public List<Sammler> GetSammlerByFirstName(string firstName)
-        {
-            if (firstName != null)
-            {
-                return context.Sammlers.Where(n => n.Firstname.Contains(firstName, StringComparison.InvariantCultureIgnoreCase)).ToList();
-            }
-            return null;
-        }
+        //public List<Sammler> GetSammlerByFirstName(string firstName)
+        //{
+        //    if (firstName != null)
+        //    {
+        //        return context.Sammlers.Where(n => n.Firstname.Contains(firstName, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        //    }
+        //    return null;
+        //}
 
-        public List<Sammler> GetSammlerBySurName(string surName)
-        {
-            if (string.IsNullOrWhiteSpace(surName))
-            {
-                return new List<Sammler>();
-            }
+        //public List<Sammler> GetSammlerBySurName(string surName)
+        //{
+        //    if (string.IsNullOrWhiteSpace(surName))
+        //    {
+        //        return new List<Sammler>();
+        //    }
 
-            return context.Sammlers
-                .Where(n => n.Surname.Contains(surName, StringComparison.InvariantCultureIgnoreCase))
-                .ToList();
-        }
+        //    return context.Sammlers
+        //        .Where(n => n.Surname.Contains(surName, StringComparison.InvariantCultureIgnoreCase))
+        //        .ToList();
+        //}
 
         public List<Sammler> GetSammlerByNickName(string nickName)
         {

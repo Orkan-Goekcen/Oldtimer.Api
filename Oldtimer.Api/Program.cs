@@ -37,6 +37,8 @@ namespace Oldtimer.Api
             builder.Services.AddMediatR(cfg => {
                 cfg.RegisterServicesFromAssembly(typeof(GetSammlerByIdQuery).Assembly);
                 cfg.RegisterServicesFromAssembly(typeof(GetSammlersQuery).Assembly);
+                cfg.RegisterServicesFromAssembly(typeof(GetSammlerByFirstNameQuery).Assembly);
+                cfg.RegisterServicesFromAssembly(typeof(GetSammlerByFirstNameQuery).Assembly);
             });
             var app = builder.Build();
 
