@@ -44,7 +44,7 @@ namespace Oldtimer.Api.Controller
         }
 
 
-        [HttpGet("Sammler/{id}/Details")]
+        [HttpGet("{id}/Details")]
         [SwaggerOperation("Get Sammler Details by ID")]
         public async Task<IActionResult> GetSammlerDetails(long id)
         {
@@ -74,7 +74,7 @@ namespace Oldtimer.Api.Controller
             return Ok(sammlerDetails);
         }
 
-        [HttpPost("Sammler")]
+        [HttpPost]
         [SwaggerOperation("Create Sammler")]
         public async Task<ActionResult<Sammler>> CreateSammler([FromBody] Sammler neuerSammler)
         {
@@ -101,7 +101,7 @@ namespace Oldtimer.Api.Controller
             }
         }
 
-        [HttpDelete("Sammler/{id}")]
+        [HttpDelete("{id}")]
         [SwaggerOperation("Delete Sammler by ID")]
         public async Task<IActionResult> DeleteSammler(long id)
         {
@@ -118,7 +118,7 @@ namespace Oldtimer.Api.Controller
             return Ok(sammler);
         }
 
-        [HttpPut("Sammler/{id}")]
+        [HttpPut("{id}")]
         [SwaggerOperation("Update Sammler by ID")]
         public async Task<IActionResult> UpdateSammler(long id, 
             [FromBody] SammlerUpdateData sammlerUpdate)

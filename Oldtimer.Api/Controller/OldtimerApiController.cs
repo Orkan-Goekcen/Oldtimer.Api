@@ -17,7 +17,7 @@ namespace Oldtimer.Api.Controller
             this.mediator = mediator;
         }
 
-        [HttpGet("Oldtimer")]
+        [HttpGet]
         [SwaggerOperation("Get all Oldtimer")]
         public async Task<IActionResult> GetAllOldtimer()
         {
@@ -27,7 +27,7 @@ namespace Oldtimer.Api.Controller
             return Ok(oldtimer);
         }
 
-        [HttpGet("Oldtimer/Sammler/{id}")]
+        [HttpGet("Sammler/{id}")]
         [SwaggerOperation("Get Oldtimer by Sammler ID")]
         public async Task<IActionResult> GetOldtimerBySammlerId(long id)
         {
@@ -41,7 +41,7 @@ namespace Oldtimer.Api.Controller
             return Ok(oldtimer);
         }
 
-        [HttpGet("Sammler/Oldtimer")]
+        [HttpGet("Sammler")]
         [SwaggerOperation("Get Sammler by Oldtimer Brand and Model")]
         public async Task<IActionResult> GetSammlerByOldtimerBrandAndModel(string brand, string model)
         {
@@ -50,15 +50,11 @@ namespace Oldtimer.Api.Controller
                 return BadRequest("Both 'brand' and 'model' cannot be empty or null.");
             }
 
+            //Damit die Groß und Kleinschreibung egal ist: 
             if (!string.IsNullOrWhiteSpace(brand))
-            {
                 brand = char.ToUpper(brand[0]) + brand.Substring(1);
-            }
-
             if (!string.IsNullOrWhiteSpace(model))
-            {
                 model = char.ToUpper(model[0]) + model.Substring(1);
-            }
 
             var query = new GetSammlerByOldtimerBrandAndModelQuery { Brand = brand, Model = model };
             var sammler = await mediator.Send(query);
@@ -71,8 +67,7 @@ namespace Oldtimer.Api.Controller
             return Ok(sammler);
         }
 
-
-        [HttpPost("Sammler/{id}/Oldtimer")]
+        [HttpPost("Sammler/{id}")]
         [SwaggerOperation("Add Oldtimer to Sammler")]
         public async Task<IActionResult> AddOldtimerToSammler(long id, [FromBody] CarDto carDto)
         {
@@ -90,7 +85,7 @@ namespace Oldtimer.Api.Controller
             return Ok(addedOldtimer);
         }
 
-        [HttpDelete("Oldtimer/{id}")]
+        [HttpDelete("{id}")]
         [SwaggerOperation("Remove Oldtimer by ID")]
         public async Task<IActionResult> RemoveOldtimer(long id)
         {
