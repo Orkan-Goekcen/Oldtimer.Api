@@ -235,9 +235,9 @@
 //        {
 //            // Arrange
 //            Sammler invalidSammler = null;
-//            var mockApiService = Mocks.CreateMockApiService(); 
+//            var mockApiService = Mocks.CreateMockApiService();
 
-//            var controller = new ApiController(mockApiService.Object); 
+//            var controller = new ApiController(mockApiService.Object);
 
 //            // Act
 //            var result = controller.CreateSammler(invalidSammler);
