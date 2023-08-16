@@ -1,9 +1,9 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Oldtimer.Api.Data;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Data.Entity;
 
 namespace Oldtimer.Api.Queries
 {

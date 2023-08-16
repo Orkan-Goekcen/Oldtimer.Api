@@ -86,21 +86,21 @@
 //            }
 //        }
 
-//        public void UpdateSammler(Sammler sammler)
-//        {
-//            var existingSammler = context.Sammlers.FirstOrDefault(s => s.Id == sammler.Id);
-//            if (existingSammler != null)
-//            {
-//                existingSammler.Firstname = sammler.Firstname;
-//                existingSammler.Surname = sammler.Surname;
-//                existingSammler.Nickname = sammler.Nickname;
-//                existingSammler.Birthdate = sammler.Birthdate;
-//                existingSammler.Email = sammler.Email;
-//                existingSammler.Telephone = sammler.Telephone;
+//public void UpdateSammler(Sammler sammler)
+//{
+//    var existingSammler = context.Sammlers.FirstOrDefault(s => s.Id == sammler.Id);
+//    if (existingSammler != null)
+//    {
+//        existingSammler.Firstname = sammler.Firstname;
+//        existingSammler.Surname = sammler.Surname;
+//        existingSammler.Nickname = sammler.Nickname;
+//        existingSammler.Birthdate = sammler.Birthdate;
+//        existingSammler.Email = sammler.Email;
+//        existingSammler.Telephone = sammler.Telephone;
 
-//                context.SaveChanges();
-//            }
-//        }
+//        context.SaveChanges();
+//    }
+//}
 
 //        public bool SammlerVorhanden(Sammler neuerSammler)
 //        {
@@ -145,52 +145,52 @@
 //    return oldtimer;
 //}
 
-public List<Sammler> GetSammlerByOldtimerBrandAndModel(string? brand, string? model)
-{
-    if (string.IsNullOrWhiteSpace(brand) && string.IsNullOrWhiteSpace(model))
-    {
-        return new List<Sammler>();
-    }
+//public List<Sammler> GetSammlerByOldtimerBrandAndModel(string? brand, string? model)
+//{
+//    if (string.IsNullOrWhiteSpace(brand) && string.IsNullOrWhiteSpace(model))
+//    {
+//        return new List<Sammler>();
+//    }
 
-    return context.Sammlers
-        .Where(s => s.Cars.Any(c => (string.IsNullOrEmpty(brand) || c.Brand.Equals(brand)) && (string.IsNullOrEmpty(model) || c.Model.Equals(model))))
-        .ToList();
-}
+//    return context.Sammlers
+//        .Where(s => s.Cars.Any(c => (string.IsNullOrEmpty(brand) || c.Brand.Equals(brand)) && (string.IsNullOrEmpty(model) || c.Model.Equals(model))))
+//        .ToList();
+//}
 
-public Car AddOldtimerToSammler(long sammlerId, CarDto carDto)
-{
-    var sammler = context.Sammlers.FirstOrDefault(s => s.Id == sammlerId);
-    if (sammler == null)
-    {
-        return null;
-    }
+//public Car AddOldtimerToSammler(long sammlerId, CarDto carDto)
+//{
+//    var sammler = context.Sammlers.FirstOrDefault(s => s.Id == sammlerId);
+//    if (sammler == null)
+//    {
+//        return null;
+//    }
 
-    var car = new Car // Mapping von carDto und car
-    {
-        Brand = carDto.Brand,
-        Model = carDto.Model,
-        LicensePlate = carDto.LicensePlate,
-        YearOfConstruction = carDto.YearOfConstruction,
-        Colors = carDto.Colors,
-        Sammler = sammler
-    };
+//    var car = new Car // Mapping von carDto und car
+//    {
+//        Brand = carDto.Brand,
+//        Model = carDto.Model,
+//        LicensePlate = carDto.LicensePlate,
+//        YearOfConstruction = carDto.YearOfConstruction,
+//        Colors = carDto.Colors,
+//        Sammler = sammler
+//    };
 
-    context.Cars.Add(car);
-    context.SaveChanges();
+//    context.Cars.Add(car);
+//    context.SaveChanges();
 
-    return car;
-}
+//    return car;
+//}
 
-public void RemoveOldtimer(long oldtimerId)
-{
-    var oldtimer = context.Cars.FirstOrDefault(c => c.Id == oldtimerId);
-    if (oldtimer != null)
-    {
-        context.Cars.Remove(oldtimer);
-        context.SaveChanges();
-    }
-}
-    }
-}
+//public void RemoveOldtimer(long oldtimerId)
+//{
+//    var oldtimer = context.Cars.FirstOrDefault(c => c.Id == oldtimerId);
+//    if (oldtimer != null)
+//    {
+//        context.Cars.Remove(oldtimer);
+//        context.SaveChanges();
+//    }
+//}
+//    }
+//}
 
 //todo: oldtimer vergessen zu queryen #upssie
