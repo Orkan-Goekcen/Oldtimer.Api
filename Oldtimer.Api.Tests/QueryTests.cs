@@ -1,18 +1,22 @@
-﻿using System;
+﻿using Xunit;
+using Moq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Oldtimer.Api.Queries;
+using Oldtimer.Api.Data;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
-using Microsoft.EntityFrameworkCore;
-using Moq;
-using Oldtimer.Api.Data;
 
-namespace Oldtimer.Api.Tests.Mocks
+namespace Oldtimer.Api.Tests
 {
-    public static class MockData
+    public class QueryTests
     {
-        public static IQueryable<Car> GetMockCarsData()
+        [Fact]
+        public async Task GetAllOldtimerQueryGetAllCars()
         {
-            var cars = new List<Car>
+            // Arrange
+            var mockCarsData = new List<Car>
             {
                 new Car
                 {
@@ -34,25 +38,27 @@ namespace Oldtimer.Api.Tests.Mocks
                     Colors = Car.Color.Blue,
                     Sammler = null
                 },
-            };
+                // Weitere Autos hier hinzufügen
+            }.AsQueryable();
 
-            return cars.AsQueryable();
-        }
-
-        public static ApiContext GetMockApiContext()
-        {
-            var mockContext = new Mock<ApiContext>();
-
-            var mockCarsData = GetMockCarsData();
             var mockDbSet = new Mock<DbSet<Car>>();
             mockDbSet.As<IQueryable<Car>>().Setup(m => m.Provider).Returns(mockCarsData.Provider);
             mockDbSet.As<IQueryable<Car>>().Setup(m => m.Expression).Returns(mockCarsData.Expression);
             mockDbSet.As<IQueryable<Car>>().Setup(m => m.ElementType).Returns(mockCarsData.ElementType);
             mockDbSet.As<IQueryable<Car>>().Setup(m => m.GetEnumerator()).Returns(mockCarsData.GetEnumerator());
 
+            var mockContext = new Mock<ApiContext>();
             mockContext.Setup(c => c.Cars).Returns(mockDbSet.Object);
 
-            return mockContext.Object;
+            var query = new GetAllOldtimerQuery();
+            var handler = new GetAllOldtimerQueryHandler(mockContext.Object);
+
+            // Act
+            var result = await handler.Handle(query, CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(mockCarsData.Count(), result.Count);
         }
     }
 }

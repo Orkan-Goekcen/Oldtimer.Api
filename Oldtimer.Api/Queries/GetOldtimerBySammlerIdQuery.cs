@@ -23,7 +23,7 @@ namespace Oldtimer.Api.Queries
         }
 
         public async Task<List<Car>> Handle(GetOldtimerBySammlerIdQuery request, CancellationToken cancellationToken)
-        {
+        {   
             var sammler = await context.Sammlers.FirstOrDefaultAsync(s => s.Id == request.SammlerId);
             if (sammler == null)
             {
