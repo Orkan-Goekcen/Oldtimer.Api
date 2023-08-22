@@ -2,7 +2,7 @@
 
 namespace Oldtimer.Api.Data
 {
-    public class ApiContext : DbContext
+    public class ApiContext : DbContext, IApiContext
     {
         public DbSet<Sammler> Sammlers { get; set; }
         public DbSet<Car> Cars { get; set; }
