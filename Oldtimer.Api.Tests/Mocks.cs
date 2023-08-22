@@ -1,58 +1,37 @@
-﻿using System;
+﻿using Moq;
+using Oldtimer.Api.Data;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
-using Microsoft.EntityFrameworkCore;
-using Moq;
-using Oldtimer.Api.Data;
 
-namespace Oldtimer.Api.Tests.Mocks
-{
-    public static class MockData
-    {
-        public static IQueryable<Car> GetMockCarsData()
+//namespace Oldtimer.Tests.Mocks
+//{
+//    public static class ApiServiceMocks
+//    {
+//        public static Mock<IApiService> CreateMockApiService()
+//        {
+//            var mockApiService = new Mock<IApiService>();
+
+//            // Führe hier alle Setups für die verschiedenen Methoden deiner ApiService-Schnittstelle durch
+//            SetupGetAllOldtimerQuery(mockApiService);
+
+//            // Füge hier weitere Setups hinzu
+
+            return mockApiService;
+        }
+
+        private static void SetupGetAllOldtimerQuery(Mock<IApiService> mockApiService)
         {
-            var cars = new List<Car>
+            var carsList = new List<Car>
             {
-                new Car
-                {
-                    Id = 1,
-                    Brand = "Porsche",
-                    Model = "911",
-                    LicensePlate = "PORSCH123",
-                    YearOfConstruction = "1969",
-                    Colors = Car.Color.Red,
-                    Sammler = null
-                },
-                new Car
-                {
-                    Id = 2,
-                    Brand = "Ford",
-                    Model = "Mustang",
-                    LicensePlate = "MUST123",
-                    YearOfConstruction = "1970",
-                    Colors = Car.Color.Blue,
-                    Sammler = null
-                },
+                new Car { Id = 1, Brand = "Toyota", Model = "Supra" },
+                new Car { Id = 2, Brand = "Ford", Model = "Mustang" }
+                // Füge hier weitere Testdaten hinzu
             };
 
-            return cars.AsQueryable();
+            mockApiService.Setup(a => a.GetAllOldtimer())
+                          .Returns(carsList);
         }
 
-        public static ApiContext GetMockApiContext()
-        {
-            var mockContext = new Mock<ApiContext>();
-
-            var mockCarsData = GetMockCarsData();
-            var mockDbSet = new Mock<DbSet<Car>>();
-            mockDbSet.As<IQueryable<Car>>().Setup(m => m.Provider).Returns(mockCarsData.Provider);
-            mockDbSet.As<IQueryable<Car>>().Setup(m => m.Expression).Returns(mockCarsData.Expression);
-            mockDbSet.As<IQueryable<Car>>().Setup(m => m.ElementType).Returns(mockCarsData.ElementType);
-            mockDbSet.As<IQueryable<Car>>().Setup(m => m.GetEnumerator()).Returns(mockCarsData.GetEnumerator());
-
-            mockContext.Setup(c => c.Cars).Returns(mockDbSet.Object);
-
-            return mockContext.Object;
-        }
+        // Füge hier weitere Methoden zum Setup von anderen Abfragen hinzu
     }
 }
