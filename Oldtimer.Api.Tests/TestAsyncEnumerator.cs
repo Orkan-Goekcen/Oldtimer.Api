@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 
 namespace Oldtimer.Api.Tests
 {
-    // Implement the IAsyncEnumerator<T> interface
     public class TestAsyncEnumerator<T> : IAsyncEnumerator<T>
     {
         private readonly IEnumerator<T> _innerEnumerator;

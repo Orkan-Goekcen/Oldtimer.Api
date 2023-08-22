@@ -28,6 +28,6 @@ namespace Oldtimer.Api.Data
 
         [JsonIgnore]
         [SwaggerSchema("The oldtimer the Sammler owns.")]
-        public List<Car> Cars { get; set; } = new List<Car>(); // Initialize as an empty list
+        public List<Car> Cars { get; set; } = new List<Car>(); // leere liste
     }
 }
