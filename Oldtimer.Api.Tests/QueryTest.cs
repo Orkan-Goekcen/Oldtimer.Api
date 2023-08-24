@@ -35,7 +35,7 @@ namespace Oldtimer.Api.Tests
             // Arrange
             var cars = TestData.GetCarsTestData();
 
-            _=mediatorMock.Setup(x => x.Send(It.IsAny<GetAllOldtimerQuery>(), It.IsAny<CancellationToken>()))
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetAllOldtimerQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(cars);
 
             // Act
@@ -45,6 +45,7 @@ namespace Oldtimer.Api.Tests
             // Assert
             Assert.Equal(cars.Count, result.Value.Count);
         }
+
         [Fact]
         public async Task GetSammlersQuery_liefert_alle_Sammler()
         {
@@ -59,6 +60,7 @@ namespace Oldtimer.Api.Tests
             // Assert
             Assert.Equal(sammlers.Count, result.Count);
         }
+
         [Fact]
         public async Task SammlerVorhandenQueryHandler_ReturnsTrue_WhenMatchingSammlerExists()
         {
