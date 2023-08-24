@@ -11,9 +11,9 @@ namespace Oldtimer.Api.Queries
 
     public class SammlerVorhandenQueryHandler : IRequestHandler<SammlerVorhandenQuery, bool>
     {
-        private readonly ApiContext context;
+        private readonly IApiContext context;
 
-        public SammlerVorhandenQueryHandler(ApiContext context)
+        public SammlerVorhandenQueryHandler(IApiContext context)
         {
             this.context = context;
         }
