@@ -1,5 +1,6 @@
 ﻿using Castle.Core.Logging;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using MySqlX.XDevAPI.Common;
@@ -62,6 +63,59 @@ namespace Oldtimer.Api.Tests
 
             // Assert
             Assert.Equal(sammlers.Count, result.Value.Count);
+        }
+
+        [Fact]
+        public async Task GetOldtimerBySammlerId_ReturnsOldtimerList()
+        {
+            // Arrange
+            var sammlerId = 1;
+            var expectedOldtimers = TestData.GetCarsTestData();
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetOldtimerBySammlerIdQuery>(), It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(expectedOldtimers);
+
+            // Act
+            var actionResult = await sutCar.GetOldtimerBySammlerId(sammlerId);
+            var result = actionResult.Result as OkObjectResult;
+            var resultValue = result.Value as List<Car>;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+            Assert.NotNull(result.Value);
+            Assert.Equal(expectedOldtimers.Count, resultValue.Count);
+        }
+        //[Fact]
+        //public async Task GetOldtimerBySammlerId_ReturnsCorrectNumberOfOldtimers()
+        //{
+        //    // Arrange
+        //    var sammlerId = 1;
+        //    var expectedOldtimers = TestData.GetCarsTestData();
+        //    mediatorMock.Setup(x => x.Send(It.IsAny<GetOldtimerBySammlerIdQuery>(), It.IsAny<CancellationToken>()))
+        //               .ReturnsAsync(expectedOldtimers);
+
+        //    // Act
+        //    var result = await sutCar.GetOldtimerBySammlerId(sammlerId);
+
+        //    // Assert
+        //    //Assert.NotNull(result.Value);
+        //    Assert.Equal(expectedOldtimers.Count, result.Value.Count);
+        //}
+
+        [Fact]
+        public async Task GetOldtimerBySammlerId_ReturnsCorrectNumberOfOldtimers()
+        {
+            // Arrange
+            var sammlerId = 1;
+            var expectedOldtimers = TestData.GetCarsTestData();
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetOldtimerBySammlerIdQuery>(), It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(expectedOldtimers);
+
+            // Act
+            var actual = await sutCar.GetOldtimerBySammlerId(sammlerId);
+
+            // Assert
+            Assert.Equal(expectedOldtimers.Count, actual.Value.Count);
         }
 
         //[Fact]
@@ -133,4 +187,4 @@ namespace Oldtimer.Api.Tests
         //    Assert.False(result);
         //}
     }
-}  
+}

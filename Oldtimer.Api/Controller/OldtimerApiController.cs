@@ -29,17 +29,19 @@ namespace Oldtimer.Api.Controller
 
         [HttpGet("Sammler/{id}")]
         [SwaggerOperation("Get Oldtimer by Sammler ID")]
-        public async Task<IActionResult> GetOldtimerBySammlerId(long id)
+        public async Task<ActionResult<List<Car>>> GetOldtimerBySammlerId(long id)
         {
-            var query = new GetOldtimerPlusSammlerBySammlerIdQuery { SammlerId = id };
+            var query = new GetOldtimerBySammlerIdQuery { SammlerId = id };
             var oldtimer = await mediator.Send(query);
 
-            if (oldtimer.Count == 0)
+            if (oldtimer == null || oldtimer.Count == 0)
             {
-                return NotFound($"Id:{id} does not exist!");
+                return NotFound($"No Oldtimers found for Sammler ID: {id}");
             }
+
             return Ok(oldtimer);
         }
+
 
         [HttpGet("Sammler")]
         [SwaggerOperation("Get Sammler by Oldtimer Brand and Model")]

@@ -15,9 +15,9 @@ namespace Oldtimer.Api.Queries
 
     public class GetOldtimerBySammlerIdQueryHandler : IRequestHandler<GetOldtimerBySammlerIdQuery, List<Car>>
     {
-        private readonly ApiContext context;
+        private readonly IApiContext context;
 
-        public GetOldtimerBySammlerIdQueryHandler(ApiContext context)
+        public GetOldtimerBySammlerIdQueryHandler(IApiContext context)
         {
             this.context = context;
         }
