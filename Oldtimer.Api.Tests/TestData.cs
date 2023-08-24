@@ -74,5 +74,52 @@ namespace Oldtimer.Api.Tests
             apiContextMock.Setup(c => c.Cars).Returns(dbSetMock.Object);
             return apiContextMock;
         }
+
+        public static List<Sammler> GetSammlersTestData()
+        {
+            var sammlers = new List<Sammler>
+        {
+            new Sammler
+            {
+                Id = 1,
+                Surname = "Frankenstein",
+                Firstname = "Frank",
+                Nickname = "Franko",
+                Birthdate = new DateTime(1997, 8, 15),
+                Email = "Frank.Franko@gmail.com",
+                Telephone = "12424242432314"
+            },
+            new Sammler
+            {
+                Id = 2,
+                Surname = "Hansemann",
+                Firstname = "Hans",
+                Nickname = "Hanso",
+                Birthdate = new DateTime(1966, 4, 16),
+                Email = "Hans.Hanso@gmail.com",
+                Telephone = "4446366663"
+            }
+        };
+            return sammlers;
+        }
+
+        public static Mock<IApiContext> GetApiContextMockForSammlers(List<Sammler> sammlers)
+        {
+            var queryableSammlers = sammlers.AsQueryable();
+            var dbSetMock = new Mock<DbSet<Sammler>>();
+
+            dbSetMock.As<IQueryable<Sammler>>().Setup(m => m.Provider).Returns(queryableSammlers.Provider);
+            dbSetMock.As<IQueryable<Sammler>>().Setup(m => m.Expression).Returns(queryableSammlers.Expression);
+            dbSetMock.As<IQueryable<Sammler>>().Setup(m => m.ElementType).Returns(queryableSammlers.ElementType);
+            dbSetMock.As<IQueryable<Sammler>>().Setup(m => m.GetEnumerator()).Returns(queryableSammlers.GetEnumerator());
+
+            dbSetMock.As<IAsyncEnumerable<Sammler>>()
+                .Setup(m => m.GetAsyncEnumerator(It.IsAny<CancellationToken>()))
+                .Returns(new TestAsyncEnumerator<Sammler>(queryableSammlers.GetEnumerator()));
+
+            var apiContextMock = new Mock<IApiContext>();
+            apiContextMock.Setup(c => c.Sammlers).Returns(dbSetMock.Object);
+            return apiContextMock;
+        }
     }
 }

@@ -43,5 +43,20 @@ namespace Oldtimer.Api.Tests
             // Assert
             Assert.Equal(cars.Count, result.Count);
         }
+        [Fact]
+        public async Task GetSammlersQuery_liefert_alle_Sammler()
+        {
+            // Arrange
+            var sammlers = TestData.GetSammlersTestData();
+            var apiContextMock = TestData.GetApiContextMockForSammlers(sammlers);
+            var queryHandler = new GetSammlersQueryHandler(apiContextMock.Object);
+
+            // Act
+            var result = await queryHandler.Handle(new GetSammlersQuery(), CancellationToken.None);
+
+            // Assert
+            Assert.Equal(sammlers.Count, result.Count);
+        }
+
     }
 }  
