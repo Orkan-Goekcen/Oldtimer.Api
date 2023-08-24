@@ -106,8 +106,8 @@ namespace Oldtimer.Api.Tests
         public static Mock<IApiContext> GetApiContextMockForSammlers(List<Sammler> sammlers)
         {
             var queryableSammlers = sammlers.AsQueryable();
-            var dbSetMock = new Mock<DbSet<Sammler>>();
 
+            var dbSetMock = new Mock<DbSet<Sammler>>();
             dbSetMock.As<IQueryable<Sammler>>().Setup(m => m.Provider).Returns(queryableSammlers.Provider);
             dbSetMock.As<IQueryable<Sammler>>().Setup(m => m.Expression).Returns(queryableSammlers.Expression);
             dbSetMock.As<IQueryable<Sammler>>().Setup(m => m.ElementType).Returns(queryableSammlers.ElementType);

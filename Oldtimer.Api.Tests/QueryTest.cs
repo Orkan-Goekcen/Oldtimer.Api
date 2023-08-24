@@ -57,6 +57,5 @@ namespace Oldtimer.Api.Tests
             // Assert
             Assert.Equal(sammlers.Count, result.Count);
         }
-
     }
 }  
