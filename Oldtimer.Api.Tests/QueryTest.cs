@@ -109,5 +109,27 @@ namespace Oldtimer.Api.Tests
             Assert.Equal(expectedSammlers.Count, resultValue.Count);
             Assert.All(resultValue, sammler => Assert.Equal(firstName, sammler.Firstname));
         }
+
+        [Fact]
+        public async Task Handle_ValidSurName_ReturnsMatchingSammlers()
+        {
+            // Arrange
+            var surName = "Smith";
+            var sammlersTestData = TestData.GetSammlersTestData();
+
+            var contextMock = new Mock<ApiContext>();
+            contextMock.Setup(c => c.Sammlers)
+                       .ReturnsDbSet(sammlersTestData);
+
+            var query = new GetSammlerBySurNameQuery { SurName = surName };
+            var handler = new GetSammlerBySurNameQueryHandler(contextMock.Object);
+
+            // Act
+            var result = await handler.Handle(query, CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(result);
+            // Füge deine eigenen Assertions hier hinzu, um das erwartete Verhalten zu überprüfen
+        }
     }
 }
