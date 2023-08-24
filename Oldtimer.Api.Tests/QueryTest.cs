@@ -17,7 +17,8 @@ namespace Oldtimer.Api.Tests
 {
     public class QueryTest
     {
-        private readonly OldtimerApiController sut;
+        private readonly OldtimerApiController sutCar;
+        private readonly SammlerApiController sutSammler;
         private readonly Mock<IMediator> mediatorMock;
         private readonly Mock<ILogger> loggerMock;
 
@@ -26,7 +27,8 @@ namespace Oldtimer.Api.Tests
             mediatorMock = new Mock<IMediator>();
             loggerMock = new Mock<ILogger>();
 
-            sut = new OldtimerApiController(mediatorMock.Object);
+            sutCar = new OldtimerApiController(mediatorMock.Object);
+            sutSammler = new SammlerApiController(mediatorMock.Object);
         }
 
         [Fact]
@@ -39,7 +41,7 @@ namespace Oldtimer.Api.Tests
                 .ReturnsAsync(cars);
 
             // Act
-            var result = await sut.GetAllOldtimer();
+            var result = await sutCar.GetAllOldtimer();
 
 
             // Assert
@@ -51,14 +53,13 @@ namespace Oldtimer.Api.Tests
         {
             // Arrange
             var sammlers = TestData.GetSammlersTestData();
-            var apiContextMock = TestData.GetApiContextMockForSammlers(sammlers);
-            var queryHandler = new GetSammlersQueryHandler(apiContextMock.Object);
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlersQuery>(), It.IsAny<CancellationToken>()));
 
             // Act
-            var result = await queryHandler.Handle(new GetSammlersQuery(), CancellationToken.None);
-
+            var result = await sutSammler.GetSammlers();
             // Assert
-            Assert.Equal(sammlers.Count, result.Count);
+            Assert.Equal(sammlers.Count, result.Value.Count);
         }
 
         [Fact]
