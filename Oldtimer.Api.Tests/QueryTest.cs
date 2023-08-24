@@ -85,5 +85,26 @@ namespace Oldtimer.Api.Tests
             Assert.NotNull(result.Value);
             Assert.Equal(expectedOldtimers.Count, resultValue.Count);
         }
+
+        [Fact]
+        public async Task GetSammlerByFirstName_ReturnsMatchingSammlerList()
+        {
+            // Arrange
+            var firstName = "Frank";
+            var sammlers = TestData.GetSammlersTestData();
+            var expectedSammlers = sammlers.Where(s => s.Firstname == firstName).ToList();
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlersQuery>(), It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(sammlers);
+
+            // Act
+            var actionResult = await sutSammler.GetSammlers(); //Diese Methode durch GetSammlersByNickname() ersetzen
+
+            // Assert
+            var resultValue = actionResult.Value;
+            Assert.NotNull(resultValue);
+            Assert.Equal(expectedSammlers.Count, resultValue.Count);
+            Assert.All(resultValue, sammler => Assert.Equal(firstName, sammler.Firstname));
+        }
     }
 }
