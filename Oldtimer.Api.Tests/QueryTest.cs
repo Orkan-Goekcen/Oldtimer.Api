@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using MySqlX.XDevAPI.Common;
+using Oldtimer.Api.Controller;
 using Oldtimer.Api.Data;
 using Oldtimer.Api.Queries;
 using System;
@@ -16,7 +17,7 @@ namespace Oldtimer.Api.Tests
 {
     public class QueryTest
     {
-        private readonly GetAllOldtimerQuery sut;
+        private readonly OldtimerApiController sut;
         private readonly Mock<IMediator> mediatorMock;
         private readonly Mock<ILogger> loggerMock;
 
@@ -25,7 +26,7 @@ namespace Oldtimer.Api.Tests
             mediatorMock = new Mock<IMediator>();
             loggerMock = new Mock<ILogger>();
 
-            sut = new GetAllOldtimerQuery();
+            sut = new OldtimerApiController(mediatorMock.Object);
         }
 
         [Fact]
@@ -33,15 +34,16 @@ namespace Oldtimer.Api.Tests
         {
             // Arrange
             var cars = TestData.GetCarsTestData();
-            var apiContextMock = TestData.GetApiContextMock(cars);
 
-            var sut = new GetAllOldtimerQueryHandler(apiContextMock.Object);
+            _=mediatorMock.Setup(x => x.Send(It.IsAny<GetAllOldtimerQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cars);
 
             // Act
-            var result = await sut.Handle(new GetAllOldtimerQuery(), CancellationToken.None);
+            var result = await sut.GetAllOldtimer();
+
 
             // Assert
-            Assert.Equal(cars.Count, result.Count);
+            Assert.Equal(cars.Count, result.Value.Count);
         }
         [Fact]
         public async Task GetSammlersQuery_liefert_alle_Sammler()

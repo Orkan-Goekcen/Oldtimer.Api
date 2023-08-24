@@ -19,12 +19,12 @@ namespace Oldtimer.Api.Controller
 
         [HttpGet]
         [SwaggerOperation("Get all Oldtimer")]
-        public async Task<IActionResult> GetAllOldtimer()
+        public async Task<ActionResult<List<Car>>> GetAllOldtimer()
         {
             var query = new GetAllOldtimerQuery { };
             var oldtimer = await mediator.Send(query);
 
-            return Ok(oldtimer);
+            return oldtimer;
         }
 
         [HttpGet("Sammler/{id}")]
