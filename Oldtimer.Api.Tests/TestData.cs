@@ -56,25 +56,6 @@ namespace Oldtimer.Api.Tests
             return cars;
         }
 
-        public static Mock<IApiContext> GetApiContextMock(List<Car> cars)
-        {
-            var queryableCars = cars.AsQueryable();
-            var dbSetMock = new Mock<DbSet<Car>>();
-
-            dbSetMock.As<IQueryable<Car>>().Setup(m => m.Provider).Returns(queryableCars.Provider);
-            dbSetMock.As<IQueryable<Car>>().Setup(m => m.Expression).Returns(queryableCars.Expression);
-            dbSetMock.As<IQueryable<Car>>().Setup(m => m.ElementType).Returns(queryableCars.ElementType);
-            dbSetMock.As<IQueryable<Car>>().Setup(m => m.GetEnumerator()).Returns(queryableCars.GetEnumerator());
-
-            dbSetMock.As<IAsyncEnumerable<Car>>()
-                .Setup(m => m.GetAsyncEnumerator(It.IsAny<CancellationToken>()))
-                .Returns(new TestAsyncEnumerator<Car>(queryableCars.GetEnumerator()));
-
-            var apiContextMock = new Mock<IApiContext>();
-            apiContextMock.Setup(c => c.Cars).Returns(dbSetMock.Object);
-            return apiContextMock;
-        }
-
         public static List<Sammler> GetSammlersTestData()
         {
             var sammlers = new List<Sammler>
@@ -101,25 +82,6 @@ namespace Oldtimer.Api.Tests
             }
         };
             return sammlers;
-        }
-
-        public static Mock<IApiContext> GetApiContextMockForSammlers(List<Sammler> sammlers)
-        {
-            var queryableSammlers = sammlers.AsQueryable();
-
-            var dbSetMock = new Mock<DbSet<Sammler>>();
-            dbSetMock.As<IQueryable<Sammler>>().Setup(m => m.Provider).Returns(queryableSammlers.Provider);
-            dbSetMock.As<IQueryable<Sammler>>().Setup(m => m.Expression).Returns(queryableSammlers.Expression);
-            dbSetMock.As<IQueryable<Sammler>>().Setup(m => m.ElementType).Returns(queryableSammlers.ElementType);
-            dbSetMock.As<IQueryable<Sammler>>().Setup(m => m.GetEnumerator()).Returns(queryableSammlers.GetEnumerator());
-
-            dbSetMock.As<IAsyncEnumerable<Sammler>>()
-                .Setup(m => m.GetAsyncEnumerator(It.IsAny<CancellationToken>()))
-                .Returns(new TestAsyncEnumerator<Sammler>(queryableSammlers.GetEnumerator()));
-
-            var apiContextMock = new Mock<IApiContext>();
-            apiContextMock.Setup(c => c.Sammlers).Returns(dbSetMock.Object);
-            return apiContextMock;
         }
     }
 }
