@@ -43,6 +43,20 @@ namespace Oldtimer.Api.Controller
             return Ok(sammler);
         }
 
+        [HttpGet("FirstName/{firstName}")]
+        [SwaggerOperation("Get Sammler by First Name")]
+        public async Task<ActionResult<List<Sammler>>> GetSammlerByFirstName(string firstName)
+        {
+            var query = new GetSammlerByFirstNameQuery { FirstName = firstName };
+            var sammlerList = await mediator.Send(query);
+
+            if (sammlerList == null || sammlerList.Count == 0)
+            {
+                return NotFound($"No Sammler found with the first name: {firstName}");
+            }
+
+            return Ok(sammlerList);
+        }
 
         [HttpGet("{id}/Details")]
         [SwaggerOperation("Get Sammler Details by ID")]

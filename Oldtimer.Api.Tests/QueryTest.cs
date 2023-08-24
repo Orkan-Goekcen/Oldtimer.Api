@@ -91,17 +91,20 @@ namespace Oldtimer.Api.Tests
         {
             // Arrange
             var firstName = "Frank";
-            var sammlers = TestData.GetSammlersTestData();
-            var expectedSammlers = sammlers.Where(s => s.Firstname == firstName).ToList();
+            var expectedSammlers = TestData.GetSammlersTestData()
+                .Where(s => s.Firstname == firstName)
+                .ToList();
 
-            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlersQuery>(), It.IsAny<CancellationToken>()))
-                       .ReturnsAsync(sammlers);
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByFirstNameQuery>(), It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(expectedSammlers);
 
             // Act
-            var actionResult = await sutSammler.GetSammlers(); //Diese Methode durch GetSammlersByNickname() ersetzen
+            var actionResult = await sutSammler.GetSammlerByFirstName(firstName);
 
             // Assert
-            var resultValue = actionResult.Value;
+            var result = actionResult.Result as OkObjectResult;
+            var resultValue = result.Value as List<Sammler>;
+            Assert.NotNull(result);
             Assert.NotNull(resultValue);
             Assert.Equal(expectedSammlers.Count, resultValue.Count);
             Assert.All(resultValue, sammler => Assert.Equal(firstName, sammler.Firstname));
