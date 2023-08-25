@@ -202,6 +202,24 @@ namespace Oldtimer.Api.Tests
         }
 
         [Fact]
+        public async Task GetSammlerByNickName_returns_not_found_on_empty_list()
+        {
+            // Arrange
+            var emptyList = new List<Sammler>();
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByNickNameQuery>(), It.IsAny<CancellationToken>()))
+                        .ReturnsAsync(emptyList);
+
+            // Act
+            var result = await sutSammler.GetSammlerByNickName("johndoe"); // Beispiel-Nickname
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<List<Sammler>>>(result);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(actionResult.Result);
+            Assert.Equal($"No Sammler found with the Nickname: johndoe", notFoundResult.Value);
+        }
+
+        [Fact]
         public async Task GetSammlerByTelePhone_ReturnsMatchingSammlerList()
         {
             // Arrange
