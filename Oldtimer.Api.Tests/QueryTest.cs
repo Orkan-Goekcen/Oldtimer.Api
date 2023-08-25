@@ -211,7 +211,7 @@ namespace Oldtimer.Api.Tests
                         .ReturnsAsync(emptyList);
 
             // Act
-            var result = await sutSammler.GetSammlerByNickName("johndoe"); // Beispiel-Nickname
+            var result = await sutSammler.GetSammlerByNickName("johndoe"); 
 
             // Assert
             var actionResult = Assert.IsType<ActionResult<List<Sammler>>>(result);
@@ -239,5 +239,24 @@ namespace Oldtimer.Api.Tests
             Assert.Equal(expectedSammlers.Count, resultValue.Count);
             Assert.All(resultValue, sammler => Assert.Equal(telePhone, sammler.Telephone));
         }
+
+        [Fact]
+        public async Task GetSammlerByTelephone_returns_not_found_on_empty_list()
+        {
+            // Arrange
+            var emptyList = new List<Sammler>();
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByTelephoneQuery>(), It.IsAny<CancellationToken>()))
+                        .ReturnsAsync(emptyList);
+
+            // Act
+            var result = await sutSammler.GetSammlerByTelephone("123456789"); 
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<List<Sammler>>>(result);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(actionResult.Result);
+            Assert.Equal($"No Sammler found with the Telephone number: 123456789", notFoundResult.Value);
+        }
+
     }
 }
