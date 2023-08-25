@@ -15,9 +15,9 @@ namespace Oldtimer.Api.Queries
 
     public class GetSammlerByTelephoneQueryHandler : IRequestHandler<GetSammlerByTelephoneQuery, List<Sammler>>
     {
-        private readonly ApiContext context;
+        private readonly IApiContext context;
 
-        public GetSammlerByTelephoneQueryHandler(ApiContext context)
+        public GetSammlerByTelephoneQueryHandler(IApiContext context)
         {
             this.context = context;
         }

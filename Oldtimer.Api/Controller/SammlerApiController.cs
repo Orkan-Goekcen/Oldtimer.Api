@@ -58,6 +58,52 @@ namespace Oldtimer.Api.Controller
             return Ok(sammlerList);
         }
 
+        [HttpGet("NickName/{nickName}")]
+        [SwaggerOperation("Get Sammler by Nickname")]
+        public async Task<ActionResult<List<Sammler>>> GetSammlerByNickName(string nickName)
+        {
+            var query = new GetSammlerByNickNameQuery { NickName = nickName };
+            var sammlerList = await mediator.Send(query);
+
+            if (sammlerList == null || sammlerList.Count == 0)
+            {
+                return NotFound($"No Sammler found with the Nickname: {nickName}");
+            }
+
+            return sammlerList;
+        }
+
+        [HttpGet("SurName/{surName}")]
+        [SwaggerOperation("Get Sammler by Surname")]
+        public async Task<ActionResult<List<Sammler>>> GetSammlerBySurName(string surName)
+        {
+            var query = new GetSammlerBySurNameQuery { SurName = surName };
+            var sammlerList = await mediator.Send(query);
+
+            if (sammlerList == null || sammlerList.Count == 0)
+            {
+                return NotFound($"No Sammler found with the Surname: {surName}");
+            }
+
+            return sammlerList;
+        }
+
+        [HttpGet("TelePhone/{telePhone}")]
+        [SwaggerOperation("Get Sammler by Telephone")]
+        public async Task<ActionResult<List<Sammler>>> GetSammlerByTelephone(string telePhone)
+        {
+            var query = new GetSammlerByTelephoneQuery { TelePhone = telePhone };
+            var sammlerList = await mediator.Send(query);
+
+            if (sammlerList == null || sammlerList.Count == 0)
+            {
+                return NotFound($"No Sammler found with the Telephone number: {telePhone}");
+            }
+
+            return sammlerList;
+        }
+
+
         [HttpGet("{id}/Details")]
         [SwaggerOperation("Get Sammler Details by ID")]
         public async Task<IActionResult> GetSammlerDetails(long id)

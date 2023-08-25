@@ -15,9 +15,9 @@ namespace Oldtimer.Api.Queries
 
     public class GetSammlerByNickNameQueryHandler : IRequestHandler<GetSammlerByNickNameQuery, List<Sammler>>
     {
-        private readonly ApiContext context;
+        private readonly IApiContext context;
 
-        public GetSammlerByNickNameQueryHandler(ApiContext context)
+        public GetSammlerByNickNameQueryHandler(IApiContext context)
         {
             this.context = context;
         }

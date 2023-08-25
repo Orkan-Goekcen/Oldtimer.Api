@@ -111,25 +111,66 @@ namespace Oldtimer.Api.Tests
         }
 
         [Fact]
-        public async Task Handle_ValidSurName_ReturnsMatchingSammlers()
+        public async Task GetSammlerBySurName_ReturnsMatchingSammlerList()
         {
             // Arrange
-            var surName = "Smith";
-            var sammlersTestData = TestData.GetSammlersTestData();
+            var surName = "Hansemann";
+            var sammlers = TestData.GetSammlersTestData();
+            var expectedSammlers = sammlers.Where(s => s.Surname == surName).ToList();
 
-            var contextMock = new Mock<ApiContext>();
-            contextMock.Setup(c => c.Sammlers)
-                       .ReturnsDbSet(sammlersTestData);
-
-            var query = new GetSammlerBySurNameQuery { SurName = surName };
-            var handler = new GetSammlerBySurNameQueryHandler(contextMock.Object);
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerBySurNameQuery>(), It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(expectedSammlers);
 
             // Act
-            var result = await handler.Handle(query, CancellationToken.None);
+            var actionResult = await sutSammler.GetSammlerBySurName(surName);
 
             // Assert
-            Assert.NotNull(result);
-            // Füge deine eigenen Assertions hier hinzu, um das erwartete Verhalten zu überprüfen
+            var resultValue = actionResult.Value;
+            Assert.NotNull(resultValue);
+            Assert.Equal(expectedSammlers.Count, resultValue.Count);
+            Assert.All(resultValue, sammler => Assert.Equal(surName, sammler.Surname));
+        }
+
+        [Fact]
+        public async Task GetSammlerByNickName_ReturnsMatchingSammlerList()
+        {
+            // Arrange
+            var nickName = "Hanso";
+            var sammlers = TestData.GetSammlersTestData();
+            var expectedSammlers = sammlers.Where(s => s.Nickname == nickName).ToList();
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByNickNameQuery>(), It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(expectedSammlers);
+
+            // Act
+            var actionResult = await sutSammler.GetSammlerByNickName(nickName);
+
+            // Assert
+            var resultValue = actionResult.Value;
+            Assert.NotNull(resultValue);
+            Assert.Equal(expectedSammlers.Count, resultValue.Count);
+            Assert.All(resultValue, sammler => Assert.Equal(nickName, sammler.Nickname));
+        }
+
+        [Fact]
+        public async Task GetSammlerByTelePhone_ReturnsMatchingSammlerList()
+        {
+            // Arrange
+            var telePhone = "12424242432314";
+            var sammlers = TestData.GetSammlersTestData();
+            var expectedSammlers = sammlers.Where(s => s.Telephone == telePhone).ToList();
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByTelephoneQuery>(), It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(expectedSammlers);
+
+            // Act
+            var actionResult = await sutSammler.GetSammlerByTelephone(telePhone);
+
+            // Assert
+            var resultValue = actionResult.Value;
+            Assert.NotNull(resultValue);
+            Assert.Equal(expectedSammlers.Count, resultValue.Count);
+            Assert.All(resultValue, sammler => Assert.Equal(telePhone, sammler.Telephone));
         }
     }
 }
