@@ -50,6 +50,22 @@ namespace Oldtimer.Api.Tests
         }
 
         [Fact]
+        public async Task GetAllOldtimer_returns_empty_list()   
+        {
+            // Arrange
+            var emptyList = new List<Car>(); // Erstelle eine leere Liste
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetAllOldtimerQuery>(), It.IsAny<CancellationToken>()))
+                        .ReturnsAsync(emptyList); // Setze das Mock-Verhalten auf die leere Liste
+
+            // Act
+            var result = await sutCar.GetAllOldtimer();
+
+            // Assert
+            Assert.Equal(emptyList.Count, result.Value.Count);
+        }
+
+        [Fact]
         public async Task GetSammlersQuery_liefert_alle_Sammler()
         {
             // Arrange
