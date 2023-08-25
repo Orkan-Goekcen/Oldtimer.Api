@@ -124,6 +124,24 @@ namespace Oldtimer.Api.Tests
         }
 
         [Fact]
+        public async Task GetSammlerByFirstName_returns_not_found_on_empty_list()
+        {
+            // Arrange
+            var emptyList = new List<Sammler>();
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByFirstNameQuery>(), It.IsAny<CancellationToken>()))
+                        .ReturnsAsync(emptyList);
+
+            // Act
+            var result = await sutSammler.GetSammlerByFirstName("Kahi"); // Beispiel-Vorname
+
+            // Assert
+            var actionResult = Assert.IsType<ActionResult<List<Sammler>>>(result);
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(actionResult.Result);
+            Assert.Equal($"No Sammler found with the first name: Kahi", notFoundResult.Value);
+        }
+
+        [Fact]
         public async Task GetSammlerBySurName_ReturnsMatchingSammlerList()
         {
             // Arrange
