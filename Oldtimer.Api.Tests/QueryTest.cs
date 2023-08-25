@@ -82,25 +82,22 @@ namespace Oldtimer.Api.Tests
         }
 
         [Fact]
-        public async Task GetOldtimerBySammlerId_ReturnsOldtimerList()
+        public async Task GetSammlers_returns_empty_list_on_failure()
         {
             // Arrange
-            var sammlerId = 1;
-            var expectedOldtimers = TestData.GetCarsTestData();
-            mediatorMock.Setup(x => x.Send(It.IsAny<GetOldtimerBySammlerIdQuery>(), It.IsAny<CancellationToken>()))
-                       .ReturnsAsync(expectedOldtimers);
+            var emptyList = new List<Sammler>();
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlersQuery>(), It.IsAny<CancellationToken>()))
+                        .ReturnsAsync(emptyList);
 
             // Act
-            var actionResult = await sutCar.GetOldtimerBySammlerId(sammlerId);
-            var result = actionResult.Result as OkObjectResult;
-            var resultValue = result.Value as List<Car>;
+            var result = await sutSammler.GetSammlers();
 
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal(200, result.StatusCode);
-            Assert.NotNull(result.Value);
-            Assert.Equal(expectedOldtimers.Count, resultValue.Count);
+            Assert.Equal(emptyList.Count, result.Value.Count);
         }
+
+
 
         [Fact]
         public async Task GetSammlerByFirstName_ReturnsMatchingSammlerList()
