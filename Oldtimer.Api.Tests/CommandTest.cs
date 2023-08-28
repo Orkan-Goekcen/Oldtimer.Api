@@ -59,7 +59,10 @@ namespace Oldtimer.Api.Tests
         public async Task AddOldtimerToSammlerQuery_fügt_Oldtimer_zum_Sammler_hinzu()
         {
             // Arrange
-            var sammlerId = 1;
+            var sammlers = TestData.GetSammlersTestData();
+            var sammler = sammlers[0];
+            var sammlerId = sammler.Id;
+
             var carDto = new CarDto
             {
                 Brand = "Audi",
