@@ -30,7 +30,7 @@ namespace Oldtimer.Api.Controller
 
         [HttpGet("{id}")]
         [SwaggerOperation("Get Sammler by ID")]
-        public async Task<IActionResult> GetSammlerById(long id)
+        public async Task<ActionResult> GetSammlerById(long id)
         {
             var query = new GetSammlerByIdQuery { SammlerId = id };
             var sammler = await mediator.Send(query);
@@ -106,7 +106,7 @@ namespace Oldtimer.Api.Controller
 
         [HttpGet("{id}/Details")]
         [SwaggerOperation("Get Sammler Details by ID")]
-        public async Task<IActionResult> GetSammlerDetails(long id)
+        public async Task<ActionResult> GetSammlerDetails(long id)
         {
             var query = new GetSammlerByIdQuery { SammlerId = id };
             var sammler = await mediator.Send(query);

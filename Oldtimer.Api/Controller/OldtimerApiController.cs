@@ -39,13 +39,13 @@ namespace Oldtimer.Api.Controller
                 return NotFound($"No Oldtimers found for Sammler ID: {id}");
             }
 
-            return Ok(oldtimer);
+            return oldtimer;
         }
 
 
         [HttpGet("Sammler")]
         [SwaggerOperation("Get Sammler by Oldtimer Brand and Model")]
-        public async Task<IActionResult> GetSammlerByOldtimerBrandAndModel(string brand, string model)
+        public async Task<ActionResult> GetSammlerByOldtimerBrandAndModel(string brand, string model)
         {
             if (string.IsNullOrWhiteSpace(brand) && string.IsNullOrWhiteSpace(model))
             {
@@ -71,7 +71,7 @@ namespace Oldtimer.Api.Controller
 
         [HttpPost("Sammler/{id}")]
         [SwaggerOperation("Add Oldtimer to Sammler")]
-        public async Task<IActionResult> AddOldtimerToSammler(long id, [FromBody] CarDto carDto)
+        public async Task<ActionResult> AddOldtimerToSammler(long id, [FromBody] CarDto carDto)
         {
             var query = new GetSammlerByIdQuery { SammlerId = id };
             var sammler = await mediator.Send(query);
@@ -89,7 +89,7 @@ namespace Oldtimer.Api.Controller
 
         [HttpDelete("{id}")]
         [SwaggerOperation("Remove Oldtimer by ID")]
-        public async Task<IActionResult> RemoveOldtimer(long id)
+        public async Task<ActionResult> RemoveOldtimer(long id)
         {
             var command = new RemoveOldtimerCommand { OldtimerId = id };
 
