@@ -97,7 +97,41 @@ namespace Oldtimer.Api.Tests
             Assert.Equal(emptyList.Count, result.Value.Count);
         }
 
+        [Fact]
+        public async Task GetSammlerById_returns_ok_on_existing_sammler()
+        {
+            // Arrange
+            var sammlers = TestData.GetSammlersTestData(); // Testdaten laden
+            var sammler = sammlers[0]; // Nehme den ersten Sammler als Beispiel
 
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<CancellationToken>()))
+                        .ReturnsAsync(sammler);
+
+            // Act
+            var result = await sutSammler.GetSammlerById(sammler.Id); // Verwende die ID des Beispiel-Sammlers
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var model = Assert.IsAssignableFrom<Sammler>(okResult.Value);
+            Assert.Equal(sammler.Id, model.Id);
+        }
+
+        [Fact]
+        public async Task GetSammlerById_returns_not_found_on_non_existing_sammler()
+        {
+            // Arrange
+            var sammlers = TestData.GetSammlersTestData(); // Testdaten laden
+            var nonExistingId = 9999; // Beispiel für eine nicht vorhandene ID
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<CancellationToken>()))
+                        .ReturnsAsync((Sammler)null); // null zurückgeben
+
+            // Act
+            var result = await sutSammler.GetSammlerById(nonExistingId);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
 
         [Fact]
         public async Task GetSammlerByFirstName_ReturnsMatchingSammlerList()
