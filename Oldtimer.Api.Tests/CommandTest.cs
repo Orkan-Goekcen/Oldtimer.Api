@@ -5,9 +5,11 @@ using Moq;
 using Oldtimer.Api.Commands;
 using Oldtimer.Api.Controller;
 using Oldtimer.Api.Data;
+using Oldtimer.Api.Queries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -82,6 +84,68 @@ namespace Oldtimer.Api.Tests
 
             Assert.NotNull(createdCarResult);
             Assert.Equal(sammlerId, createdCarResult.Sammler.Id);
+        }
+
+        [Fact]
+        public async Task DeleteSammlerCommandHandler_löscht_Sammler()
+        {
+            // Arrange
+            var sammlerId = 1;
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<DeleteSammlerCommand>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Value);
+
+            // Act
+            var result = await sutSammler.DeleteSammler(sammlerId);
+
+            // Assert
+            var objectResult = Assert.IsType<OkResult>(result);
+            Assert.Equal(200, objectResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task RemoveOldtimerCommandHandler_entfernt_Oldtimer()
+        {
+            // Arrange
+            var oldtimerId = 1;
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<RemoveOldtimerCommand>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Value);
+
+            // Act
+            var result = await sutCar.RemoveOldtimer(oldtimerId);
+
+            // Assert
+            var objectResult = Assert.IsType<OkResult>(result);
+            Assert.Equal(200, objectResult.StatusCode);
+        }
+
+
+        [Fact]
+        public async Task UpdateSammlerCommand_aktualisiert_Sammler()
+        {
+            // Arrange
+            var sammlerId = 1;
+            var updatedSammlerData = new SammlerUpdateData
+            {
+                Firstname = "UpdatedFirstName",
+                Surname = "UpdatedSurname",
+                Nickname = "UpdatedNickname",
+                Birthdate = new DateTime(1990, 1, 1),
+                Email = "updated.email@example.com",
+                Telephone = "555-555-5555"
+            };
+
+            var existingSammler = new Sammler { Id = sammlerId };
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(existingSammler);
+
+            // Act
+            var result = await sutSammler.UpdateSammler(sammlerId, updatedSammlerData);
+
+            // Assert
+            mediatorMock.Verify(m => m.Send(It.IsAny<UpdateSammlerCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+            Assert.IsType<OkObjectResult>(result);
         }
     }
 }

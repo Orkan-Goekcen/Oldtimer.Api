@@ -163,7 +163,7 @@ namespace Oldtimer.Api.Controller
 
         [HttpDelete("{id}")]
         [SwaggerOperation("Delete Sammler by ID")]
-        public async Task<IActionResult> DeleteSammler(long id)
+        public async Task<ActionResult> DeleteSammler(long id)
         {
             var query = new GetSammlerByIdQuery { SammlerId = id };
             var sammler = await mediator.Send(query);
@@ -180,7 +180,7 @@ namespace Oldtimer.Api.Controller
 
         [HttpPut("{id}")]
         [SwaggerOperation("Update Sammler by ID")]
-        public async Task<IActionResult> UpdateSammler(long id, 
+        public async Task<ActionResult> UpdateSammler(long id, 
             [FromBody] SammlerUpdateData sammlerUpdate)
 
         {
