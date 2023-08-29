@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Oldtimer.Api.Commands;
+using Oldtimer.Api.Controller;
 using Oldtimer.Api.Data;
 using Oldtimer.Api.Examples;
 using Oldtimer.Api.Queries;
@@ -34,24 +36,11 @@ namespace Oldtimer.Api
             builder.Services.AddSingleton<IExamplesProvider<Sammler>, SammlerExample>();
             builder.Services.AddSingleton<Sammler>();
 
+
+
+            builder.Services.AddValidatorsFromAssemblyContaining<OldtimerApiController>();
             builder.Services.AddMediatR(cfg => {
-                cfg.RegisterServicesFromAssembly(typeof(UpdateSammlerCommand).Assembly);
-                cfg.RegisterServicesFromAssembly(typeof(AddSammlerCommand).Assembly);
-                cfg.RegisterServicesFromAssembly(typeof(DeleteSammlerCommand).Assembly);
-
-                cfg.RegisterServicesFromAssembly(typeof(AddOldtimerToSammlerCommand).Assembly);
-                cfg.RegisterServicesFromAssembly(typeof(RemoveOldtimerCommand).Assembly);
-
-                cfg.RegisterServicesFromAssembly(typeof(GetSammlerByIdQuery).Assembly);
-                cfg.RegisterServicesFromAssembly(typeof(GetSammlersQuery).Assembly);
-                cfg.RegisterServicesFromAssembly(typeof(GetSammlerByFirstNameQuery).Assembly);
-                cfg.RegisterServicesFromAssembly(typeof(GetSammlerBySurNameQuery).Assembly);
-                cfg.RegisterServicesFromAssembly(typeof(GetSammlerByNickNameQuery).Assembly);
-                cfg.RegisterServicesFromAssembly(typeof(GetSammlerByTelephoneQuery).Assembly);
-
                 cfg.RegisterServicesFromAssembly(typeof(GetAllOldtimerQuery).Assembly);
-                cfg.RegisterServicesFromAssembly(typeof(GetOldtimerBySammlerIdQuery).Assembly);
-                cfg.RegisterServicesFromAssembly(typeof(GetOldtimerPlusSammlerBySammlerIdQuery).Assembly);
             });
             var app = builder.Build();
 

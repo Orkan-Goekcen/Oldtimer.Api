@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Oldtimer.Api.Commands;
 using Oldtimer.Api.Data;
@@ -71,14 +72,18 @@ namespace Oldtimer.Api.Controller
 
         [HttpPost("Sammler/{id}")]
         [SwaggerOperation("Add Oldtimer to Sammler")]
-        public async Task<ActionResult> AddOldtimerToSammler(long id, [FromBody] CarDto carDto)
+        public async Task<ActionResult> AddOldtimerToSammler(long id, [FromBody] CarDto carDto, [FromServices] IValidator<CarDto> validator)
         {
             var query = new GetSammlerByIdQuery { SammlerId = id };
             var sammler = await mediator.Send(query);
 
+            var validationResult = await validator.ValidateAsync(carDto);
+
+            if (!validationResult.IsValid)
+                return ValidationProblem(new ValidationProblemDetails(validationResult.ToDictionary()));
             if (sammler == null)
             {
-                return NotFound();
+                NotFound();
             }
 
             var addOldtimerToSammlerCommand = new AddOldtimerToSammlerCommand { SammlerId = id, CarDto = carDto };
@@ -92,8 +97,12 @@ namespace Oldtimer.Api.Controller
         public async Task<ActionResult> RemoveOldtimer(long id)
         {
             var command = new RemoveOldtimerCommand { OldtimerId = id };
+            bool success = await mediator.Send(command);
 
-            await mediator.Send(command);
+            if (!success)
+            {
+                return NotFound();
+            }
 
             return Ok();
         }

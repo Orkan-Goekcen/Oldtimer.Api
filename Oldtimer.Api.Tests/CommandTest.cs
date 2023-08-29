@@ -6,6 +6,7 @@ using Oldtimer.Api.Commands;
 using Oldtimer.Api.Controller;
 using Oldtimer.Api.Data;
 using Oldtimer.Api.Queries;
+using Oldtimer.Api.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,6 +62,7 @@ namespace Oldtimer.Api.Tests
         {
             // Arrange
             var sammlerId = 1;
+            var validatorMock = new Mock<CarDtoValidator>();
 
             var carDto = new CarDto
             {
@@ -80,9 +82,11 @@ namespace Oldtimer.Api.Tests
 
 
             // Act
-            var result = await sutCar.AddOldtimerToSammler(sammlerId, carDto);
+            
+            var result = await sutCar.AddOldtimerToSammler(sammlerId, carDto, validatorMock.Object);
 
             // Assert
+            validatorMock.Verify(x => x.ValidateAsync(It.IsAny<CarDto>(), It.IsAny<CancellationToken>()), Times.Once);
             var objectResult = Assert.IsType<OkResult>(result);
             Assert.Equal(200, objectResult.StatusCode);
         }
@@ -134,7 +138,7 @@ namespace Oldtimer.Api.Tests
 
             //Unit wird verwendet wenn die Methode keinen relevanten Wert zurückgibt. Er bestätigt dennoch, dass die Aktion erfolgreich ausgeführt wurde.
             mediatorMock.Setup(x => x.Send(It.IsAny<RemoveOldtimerCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Unit.Value);
+                       .ReturnsAsync(true);
 
             // Act
             var result = await sutCar.RemoveOldtimer(oldtimerId);
@@ -147,11 +151,11 @@ namespace Oldtimer.Api.Tests
         [Fact]
         public async Task RemoveOldtimerCommandHandler_entfernt_nicht_nichtvorhandenen_Oldtimer()
         {
-            // Arrange
+            // Arrang
             var oldtimerId = 999; // Nicht vorhandene Oldtimer-ID
 
-            mediatorMock.Setup(x => x.Send(It.IsAny<RemoveOldtimerCommand>(), It.IsAny<System.Threading.CancellationToken>()))
-                       .ReturnsAsync(Unit.Value); // Einheitliche Rückgabe, da es keinen Oldtimer gibt
+            mediatorMock.Setup(x => x.Send(It.IsAny<RemoveOldtimerCommand>(), It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(false);
 
             // Act
             var result = await sutCar.RemoveOldtimer(oldtimerId);

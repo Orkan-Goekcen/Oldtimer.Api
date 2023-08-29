@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Oldtimer.Api.Commands
 {
-    public class RemoveOldtimerCommand : IRequest<Unit>
+    public class RemoveOldtimerCommand : IRequest<bool>
     {
         public long OldtimerId { get; set; }
     }
 
-    public class RemoveOldtimerCommandHandler : IRequestHandler<RemoveOldtimerCommand, Unit>
+    public class RemoveOldtimerCommandHandler : IRequestHandler<RemoveOldtimerCommand, bool>
     {
         private readonly ApiContext _context;
 
@@ -20,16 +20,19 @@ namespace Oldtimer.Api.Commands
             _context = context;
         }
 
-        public async Task<Unit> Handle(RemoveOldtimerCommand request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(RemoveOldtimerCommand request, CancellationToken cancellationToken)
         {
             var oldtimer = await _context.Cars.FirstOrDefaultAsync(c => c.Id == request.OldtimerId, cancellationToken);
-            if (oldtimer != null)
+
+            if (oldtimer == null)
             {
-                _context.Cars.Remove(oldtimer);
-                await _context.SaveChangesAsync(cancellationToken);
+                return false; // Eintrag nicht gefunden, Löschvorgang nicht erfolgreich
             }
 
-            return Unit.Value;
+            _context.Cars.Remove(oldtimer);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return true; // Erfolgreich gelöscht
         }
     }
 }
