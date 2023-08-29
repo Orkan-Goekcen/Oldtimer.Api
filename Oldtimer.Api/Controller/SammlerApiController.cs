@@ -166,16 +166,16 @@ namespace Oldtimer.Api.Controller
         public async Task<ActionResult> DeleteSammler(long id)
         {
             var query = new GetSammlerByIdQuery { SammlerId = id };
-            var sammler = await mediator.Send(query);
+            /*var sammler =*/ await mediator.Send(query);
 
-            if (sammler == null)
+            if (query == null)
             {
                 return NotFound();
             }
             var deleteSammlerCommand = new DeleteSammlerCommand { Id = id };
             await mediator.Send(deleteSammlerCommand);
 
-            return Ok(sammler);
+            return Ok(/*sammler*/);
         }
 
         [HttpPut("{id}")]

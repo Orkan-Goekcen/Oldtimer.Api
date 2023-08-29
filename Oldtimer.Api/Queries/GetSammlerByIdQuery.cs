@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Oldtimer.Api.Data;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,10 +21,11 @@ namespace Oldtimer.Api.Queries
         }
 
         public async Task<Sammler> Handle(GetSammlerByIdQuery request, CancellationToken cancellationToken)
-        {   
-            var result = await context.FindAsync<Sammler>(request.SammlerId);
+        {
+            var sammler = await context.Sammlers.FirstOrDefaultAsync(s => s.Id == request.SammlerId, cancellationToken);
+            //var result = await context.FindAsync<Sammler>(request.SammlerId);
 
-            return result;
+            return sammler;
         }
     }
 }
