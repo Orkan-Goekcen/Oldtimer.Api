@@ -186,5 +186,30 @@ namespace Oldtimer.Api.Tests
             mediatorMock.Verify(m => m.Send(It.IsAny<UpdateSammlerCommand>(), It.IsAny<CancellationToken>()), Times.Once);
             Assert.IsType<OkObjectResult>(result);
         }
+
+        [Fact]
+        public async Task UpdateSammlerCommand_ungültige_ID()
+        {
+            // Arrange
+            var sammlerId = 999; // Nicht vorhandene Sammler-ID
+            var updatedSammlerData = new SammlerUpdateData
+            {
+                Firstname = "UpdatedFirstName",
+                Surname = "UpdatedSurname",
+                Nickname = "UpdatedNickname",
+                Birthdate = new DateTime(1990, 1, 1),
+                Email = "updated.email@example.com",
+                Telephone = "555-555-5555"
+            };
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<System.Threading.CancellationToken>()))
+                       .ReturnsAsync((Sammler)null); // Kein Sammler mit der ID vorhanden
+
+            // Act
+            var result = await sutSammler.UpdateSammler(sammlerId, updatedSammlerData);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
     }
 }
