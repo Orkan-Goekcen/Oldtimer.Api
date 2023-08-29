@@ -109,6 +109,7 @@ namespace Oldtimer.Api.Tests
             // Arrange
             var oldtimerId = 1;
 
+            //Unit wird verwendet wenn die Methode keinen relevanten Wert zurückgibt. Er bestätigt dennoch, dass die Aktion erfolgreich ausgeführt wurde.
             mediatorMock.Setup(x => x.Send(It.IsAny<RemoveOldtimerCommand>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Unit.Value);
 
