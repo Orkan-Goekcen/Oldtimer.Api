@@ -111,7 +111,7 @@ namespace Oldtimer.Api.Tests
         }
 
         [Fact]
-        public async Task DeleteSammlerCommandHandler_löscht_nicht_vorhandenen_Sammler()
+        public async Task DeleteSammlerCommandHandler_löscht_nicht_nichtvorhandenen_Sammler()
         {
             // Arrange
             var sammlerId = 999; // Nicht vorhandene Sammler-ID
@@ -144,6 +144,21 @@ namespace Oldtimer.Api.Tests
             Assert.Equal(200, objectResult.StatusCode);
         }
 
+        [Fact]
+        public async Task RemoveOldtimerCommandHandler_entfernt_nicht_nichtvorhandenen_Oldtimer()
+        {
+            // Arrange
+            var oldtimerId = 999; // Nicht vorhandene Oldtimer-ID
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<RemoveOldtimerCommand>(), It.IsAny<System.Threading.CancellationToken>()))
+                       .ReturnsAsync(Unit.Value); // Einheitliche Rückgabe, da es keinen Oldtimer gibt
+
+            // Act
+            var result = await sutCar.RemoveOldtimer(oldtimerId);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
 
         [Fact]
         public async Task UpdateSammlerCommand_aktualisiert_Sammler()
