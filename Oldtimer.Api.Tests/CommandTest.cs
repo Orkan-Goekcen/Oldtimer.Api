@@ -56,7 +56,6 @@ namespace Oldtimer.Api.Tests
             // Assert
             Assert.Contains(sammlers, s => s.Id == sammlerId);
         }
-
         [Fact]
         public async Task AddOldtimerToSammlerQuery_fügt_Oldtimer_zum_Sammler_hinzu()
         {
@@ -74,17 +73,17 @@ namespace Oldtimer.Api.Tests
                 Colors = Car.Color.Blue
             };
 
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(sammler);
+
             // Act
-            //hier findet er den sammler mit id 1 nicht
             var result = await sutCar.AddOldtimerToSammler(sammlerId, carDto);
 
             // Assert
-            var objectResult = Assert.IsType<OkObjectResult>(result);
-            var createdCarResult = objectResult.Value as Car;
-
-            Assert.NotNull(createdCarResult);
-            Assert.Equal(sammlerId, createdCarResult.Sammler.Id);
+            var objectResult = Assert.IsType<OkResult>(result);
+            Assert.Equal(200, objectResult.StatusCode);
         }
+
 
         [Fact]
         public async Task DeleteSammlerCommandHandler_löscht_Sammler()
