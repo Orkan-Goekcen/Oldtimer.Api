@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -36,6 +37,7 @@ namespace Oldtimer.Api.Tests
         public async Task AddSammlerCommandQuery_fügt_Sammler_hinzu()
         {
             // Arrange
+            var validatorMock = new Mock<SammlerValidator>();
             var sammlerId = 5;
             var carDto = new CarDto
             {
@@ -55,14 +57,16 @@ namespace Oldtimer.Api.Tests
             var result = await sutSammler.GetSammlerById(sammlerId);
 
             // Assert
+            mediatorMock.Verify(m => m.Send(It.IsAny<UpdateSammlerCommand>(), It.IsAny<CancellationToken>()), Times.Once);
             Assert.Contains(sammlers, s => s.Id == sammlerId);
         }
+
         [Fact]
         public async Task AddOldtimerToSammlerQuery_fügt_Oldtimer_zum_Sammler_hinzu()
         {
             // Arrange
-            var sammlerId = 1;
             var validatorMock = new Mock<CarDtoValidator>();
+            var sammlerId = 1;
 
             var carDto = new CarDto
             {
@@ -168,6 +172,8 @@ namespace Oldtimer.Api.Tests
         public async Task UpdateSammlerCommand_aktualisiert_Sammler()
         {
             // Arrange
+            var validatorMock = new Mock<SammlerUpdateDataValidator>();
+
             var sammlerId = 1;
             var updatedSammlerData = new SammlerUpdateData
             {
@@ -184,7 +190,7 @@ namespace Oldtimer.Api.Tests
                        .ReturnsAsync(existingSammler);
 
             // Act
-            var result = await sutSammler.UpdateSammler(sammlerId, updatedSammlerData);
+            var result = await sutSammler.UpdateSammler(sammlerId, updatedSammlerData, validatorMock.Object);
 
             // Assert
             mediatorMock.Verify(m => m.Send(It.IsAny<UpdateSammlerCommand>(), It.IsAny<CancellationToken>()), Times.Once);
@@ -195,6 +201,8 @@ namespace Oldtimer.Api.Tests
         public async Task UpdateSammlerCommand_ungültige_ID()
         {
             // Arrange
+            var validatorMock = new Mock<SammlerUpdateDataValidator>();
+
             var sammlerId = 999; // Nicht vorhandene Sammler-ID
             var updatedSammlerData = new SammlerUpdateData
             {
@@ -206,13 +214,14 @@ namespace Oldtimer.Api.Tests
                 Telephone = "555-555-5555"
             };
 
-            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<System.Threading.CancellationToken>()))
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<CancellationToken>()))
                        .ReturnsAsync((Sammler)null); // Kein Sammler mit der ID vorhanden
 
             // Act
-            var result = await sutSammler.UpdateSammler(sammlerId, updatedSammlerData);
+            var result = await sutSammler.UpdateSammler(sammlerId, updatedSammlerData, validatorMock.Object);
 
             // Assert
+            mediatorMock.Verify(m => m.Send(It.IsAny<UpdateSammlerCommand>(), It.IsAny<CancellationToken>()), Times.Once);
             Assert.IsType<NotFoundResult>(result);
         }
     }
