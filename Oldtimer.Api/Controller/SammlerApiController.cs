@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Oldtimer.Api.Commands;
 using Oldtimer.Api.Data;
@@ -136,10 +137,17 @@ namespace Oldtimer.Api.Controller
 
         [HttpPost]
         [SwaggerOperation("Create Sammler")]
-        public async Task<ActionResult<Sammler>> CreateSammler([FromBody] Sammler neuerSammler)
+        public async Task<ActionResult<Sammler>> CreateSammler([FromBody] Sammler neuerSammler, [FromServices] IValidator<Sammler> validator)
         {
             var query = new SammlerVorhandenQuery { NeuerSammler = neuerSammler };
             var sammlerBereitsVorhanden = await mediator.Send(query);
+
+            var validationResult = await validator.ValidateAsync(neuerSammler);
+
+            if (!validationResult.IsValid)
+            {
+                return ValidationProblem(new ValidationProblemDetails(validationResult.ToDictionary()));
+            }
 
             if (sammlerBereitsVorhanden)
             {
@@ -180,9 +188,7 @@ namespace Oldtimer.Api.Controller
 
         [HttpPut("{id}")]
         [SwaggerOperation("Update Sammler by ID")]
-        public async Task<ActionResult> UpdateSammler(long id, 
-            [FromBody] SammlerUpdateData sammlerUpdate)
-
+        public async Task<ActionResult> UpdateSammler(long id, [FromBody] SammlerUpdateData sammlerUpdate, [FromServices] IValidator<SammlerUpdateData> validator)
         {
             var query = new GetSammlerByIdQuery { SammlerId = id };
             var sammler = await mediator.Send(query);
@@ -190,6 +196,13 @@ namespace Oldtimer.Api.Controller
             if (sammler == null)
             {
                 return NotFound();
+            }
+
+            var validationResult = await validator.ValidateAsync(sammlerUpdate);
+
+            if (!validationResult.IsValid)
+            {
+                return ValidationProblem(new ValidationProblemDetails(validationResult.ToDictionary()));
             }
 
             // Mapping von Sammler und SammlerUpdateModel
@@ -200,10 +213,11 @@ namespace Oldtimer.Api.Controller
             sammler.Email = sammlerUpdate.Email;
             sammler.Telephone = sammlerUpdate.Telephone;
 
-            var updateSammlerCommand = new UpdateSammlerCommand { Sammler = sammler};
+            var updateSammlerCommand = new UpdateSammlerCommand { Sammler = sammler };
             await mediator.Send(updateSammlerCommand);
 
             return Ok(sammler);
         }
+
     }
 }
