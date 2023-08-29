@@ -74,15 +74,15 @@ namespace Oldtimer.Api.Controller
         public async Task<ActionResult> AddOldtimerToSammler(long id, [FromBody] CarDto carDto)
         {
             var query = new GetSammlerByIdQuery { SammlerId = id };
-            await mediator.Send(query);
+            var sammler = await mediator.Send(query);
 
-            if (query == null)
+            if (sammler == null)
             {
                 return NotFound();
             }
 
             var addOldtimerToSammlerCommand = new AddOldtimerToSammlerCommand { SammlerId = id, CarDto = carDto };
-            await mediator.Send(addOldtimerToSammlerCommand);
+            var addedOldtimer = await mediator.Send(addOldtimerToSammlerCommand);
 
             return Ok();
         }

@@ -60,9 +60,7 @@ namespace Oldtimer.Api.Tests
         public async Task AddOldtimerToSammlerQuery_fügt_Oldtimer_zum_Sammler_hinzu()
         {
             // Arrange
-            var sammlers = TestData.GetSammlersTestData();
-            var sammler = sammlers[0];
-            var sammlerId = sammler.Id;
+            var sammlerId = 1;
 
             var carDto = new CarDto
             {
@@ -74,7 +72,12 @@ namespace Oldtimer.Api.Tests
             };
 
             mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<CancellationToken>()))
-                       .ReturnsAsync(sammler);
+           .ReturnsAsync((GetSammlerByIdQuery query, CancellationToken cancellationToken) =>
+           {
+               var sammlers = TestData.GetSammlersTestData();
+               return sammlers.FirstOrDefault(s => s.Id == query.SammlerId);
+           });
+
 
             // Act
             var result = await sutCar.AddOldtimerToSammler(sammlerId, carDto);
@@ -91,8 +94,13 @@ namespace Oldtimer.Api.Tests
             // Arrange
             var sammlerId = 1;
 
-            mediatorMock.Setup(x => x.Send(It.IsAny<DeleteSammlerCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Unit.Value);
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((GetSammlerByIdQuery query, CancellationToken cancellationToken) =>
+            {
+                var sammlers = TestData.GetSammlersTestData();
+                return sammlers.FirstOrDefault(s => s.Id == query.SammlerId);
+            });
+
 
             // Act
             var result = await sutSammler.DeleteSammler(sammlerId);
@@ -100,6 +108,22 @@ namespace Oldtimer.Api.Tests
             // Assert
             var objectResult = Assert.IsType<OkResult>(result);
             Assert.Equal(200, objectResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task DeleteSammlerCommandHandler_löscht_nicht_vorhandenen_Sammler()
+        {
+            // Arrange
+            var sammlerId = 999; // Nicht vorhandene Sammler-ID
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<DeleteSammlerCommand>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Value); // Einheitliche Rückgabe, da es keinen Sammler gibt
+
+            // Act
+            var result = await sutSammler.DeleteSammler(sammlerId);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
         }
 
         [Fact]
