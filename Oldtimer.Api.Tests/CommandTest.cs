@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -66,33 +67,40 @@ namespace Oldtimer.Api.Tests
         {
             // Arrange
             var validatorMock = new Mock<CarDtoValidator>();
+
             var sammlerId = 1;
 
             var carDto = new CarDto
             {
+                SammlerId = 1,
                 Brand = "Audi",
                 Model = "A4",
                 LicensePlate = "ABC123",
-                YearOfConstruction = "2022",
+                YearOfConstruction = "1990",
                 Colors = Car.Color.Blue
             };
 
-            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<CancellationToken>()))
-           .ReturnsAsync((GetSammlerByIdQuery query, CancellationToken cancellationToken) =>
-           {
-               var sammlers = TestData.GetSammlersTestData();
-               return sammlers.FirstOrDefault(s => s.Id == query.SammlerId);
-           });
+            var validationResult = new ValidationResult(); // Hier kannst du das gewünschte ValidationResult erstellen
 
+            validatorMock
+                .Setup(x => x.ValidateAsync(carDto, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(validationResult);
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((GetSammlerByIdQuery query, CancellationToken cancellationToken) =>
+                {
+                    var sammlers = TestData.GetSammlersTestData();
+                    return sammlers.FirstOrDefault(s => s.Id == query.SammlerId);
+                });
 
             // Act
-            
             var result = await sutCar.AddOldtimerToSammler(sammlerId, carDto, validatorMock.Object);
 
             // Assert
-            validatorMock.Verify(x => x.ValidateAsync(It.IsAny<CarDto>(), It.IsAny<CancellationToken>()), Times.Once);
+            validatorMock.Verify(x => x.ValidateAsync(carDto, It.IsAny<CancellationToken>()), Times.Once);
             var objectResult = Assert.IsType<OkResult>(result);
             Assert.Equal(200, objectResult.StatusCode);
+
         }
 
 

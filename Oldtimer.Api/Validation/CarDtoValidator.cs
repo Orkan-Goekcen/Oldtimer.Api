@@ -29,7 +29,6 @@ namespace Oldtimer.Api.Validation
                 .IsInEnum().WithMessage("Invalid color value.");
         }
 
-        // Prüft ob das Auto mindestens 30 jahre alt ist. Autos zählen erst ab 30 Jahren als Old Timer
         private bool BeAtLeast30YearsOld(string yearOfConstruction)
         {
             if (int.TryParse(yearOfConstruction, out int year))
