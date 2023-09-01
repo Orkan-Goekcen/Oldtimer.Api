@@ -38,36 +38,36 @@ namespace Oldtimer.Api.Tests
         public async Task AddSammlerCommandQuery_fügt_Sammler_hinzu()
         {
             // Arrange
-            var validatorMock = new Mock<SammlerValidator>();
             var sammlerId = 5;
-            var carDto = new CarDto
+            var neuerSammler = new Sammler
             {
-                Brand = "Audi",
-                Model = "A4",
-                LicensePlate = "ABC123",
-                YearOfConstruction = "2022",
-                Colors = Car.Color.Blue
+                Id = sammlerId,
+                Firstname = "John",
+                Surname = "Doe",
             };
-            var sammler = new Sammler { Id = sammlerId };
-            var sammlers = new List<Sammler> { sammler };
 
             mediatorMock.Setup(x => x.Send(It.IsAny<AddSammlerCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(sammler);
+                        .ReturnsAsync(neuerSammler);
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<CancellationToken>()))
+                        .ReturnsAsync(neuerSammler); // Mock das Abrufen des Sammlers
 
             // Act
             var result = await sutSammler.GetSammlerById(sammlerId);
 
             // Assert
-            mediatorMock.Verify(m => m.Send(It.IsAny<UpdateSammlerCommand>(), It.IsAny<CancellationToken>()), Times.Once);
-            Assert.Contains(sammlers, s => s.Id == sammlerId);
+            var objectResult = Assert.IsType<OkObjectResult>(result);
+            // IsAssignableFrom<Sammler> prüft ob das Objekt vom Typ Sammler abgeleitet oder implementiert wird
+            var addedSammler = Assert.IsAssignableFrom<Sammler>(objectResult.Value);
+            Assert.Equal(sammlerId, addedSammler.Id);
         }
+
+
 
         [Fact]
         public async Task AddOldtimerToSammlerQuery_fügt_Oldtimer_zum_Sammler_hinzu()
         {
             // Arrange
-            var validatorMock = new Mock<CarDtoValidator>();
-
             var sammlerId = 1;
 
             var carDto = new CarDto
@@ -80,11 +80,12 @@ namespace Oldtimer.Api.Tests
                 Colors = Car.Color.Blue
             };
 
-            var validationResult = new ValidationResult(); // Hier kannst du das gewünschte ValidationResult erstellen
+            var expectedValidationResult = new ValidationResult(); // Erwartetes ValidationResult
 
+            var validatorMock = new Mock<IValidator<CarDto>>();
             validatorMock
                 .Setup(x => x.ValidateAsync(carDto, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(validationResult);
+                .ReturnsAsync(expectedValidationResult);
 
             mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((GetSammlerByIdQuery query, CancellationToken cancellationToken) =>
@@ -100,8 +101,8 @@ namespace Oldtimer.Api.Tests
             validatorMock.Verify(x => x.ValidateAsync(carDto, It.IsAny<CancellationToken>()), Times.Once);
             var objectResult = Assert.IsType<OkResult>(result);
             Assert.Equal(200, objectResult.StatusCode);
-
         }
+
 
 
         [Fact]
@@ -182,7 +183,7 @@ namespace Oldtimer.Api.Tests
             // Arrange
             var validatorMock = new Mock<SammlerUpdateDataValidator>();
 
-            var sammlerId = 1;
+            var sammlerId = 5;
             var updatedSammlerData = new SammlerUpdateData
             {
                 Firstname = "UpdatedFirstName",
@@ -229,8 +230,8 @@ namespace Oldtimer.Api.Tests
             var result = await sutSammler.UpdateSammler(sammlerId, updatedSammlerData, validatorMock.Object);
 
             // Assert
-            mediatorMock.Verify(m => m.Send(It.IsAny<UpdateSammlerCommand>(), It.IsAny<CancellationToken>()), Times.Once);
             Assert.IsType<NotFoundResult>(result);
+            mediatorMock.Verify(m => m.Send(It.IsAny<UpdateSammlerCommand>(), It.IsAny<CancellationToken>()), Times.Never);
         }
     }
 }
