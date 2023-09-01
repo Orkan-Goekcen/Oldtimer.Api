@@ -184,21 +184,32 @@ namespace Oldtimer.Api.Tests
             var validatorMock = new Mock<SammlerUpdateDataValidator>();
 
             var sammlerId = 5;
-            var updatedSammlerData = new SammlerUpdateData
+            var neuerSammler = new Sammler
             {
-                Firstname = "UpdatedFirstName",
-                Surname = "UpdatedSurname",
-                Nickname = "UpdatedNickname",
-                Birthdate = new DateTime(1990, 1, 1),
-                Email = "updated.email@example.com",
-                Telephone = "555-555-5555"
+                Id = 66,
+                Surname = "Mustermann",
+                Firstname = "Max",
+                Nickname = "Maxi",
+                Birthdate = new DateTime(1990, 1, 1), 
+                Email = "max.mustermann@example.com",
+                Telephone = "1234567890"
+
             };
 
-            var existingSammler = new Sammler { Id = sammlerId };
-            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<CancellationToken>()))
-                       .ReturnsAsync(existingSammler);
+            var updatedSammlerData = new SammlerUpdateData
+            {
+                Surname = "Doe",
+                Firstname = "John",
+                Nickname = "Johnny",
+                Birthdate = new DateTime(1985, 5, 15), // Ein gültiges Geburtsdatum in der Vergangenheit
+                Email = "john.doe@example.com",
+                Telephone = "555-123-4567"
+            };
 
-            // Act
+            mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<CancellationToken>()))
+                       .ReturnsAsync(neuerSammler);
+
+            // Act  
             var result = await sutSammler.UpdateSammler(sammlerId, updatedSammlerData, validatorMock.Object);
 
             // Assert

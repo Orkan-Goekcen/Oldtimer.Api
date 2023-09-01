@@ -205,6 +205,7 @@ namespace Oldtimer.Api.Controller
                 return ValidationProblem(new ValidationProblemDetails(validationResult.ToDictionary()));
             }
 
+
             // Mapping von Sammler und SammlerUpdateModel
             sammler.Surname = sammlerUpdate.Surname;
             sammler.Firstname = sammlerUpdate.Firstname;
