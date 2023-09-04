@@ -46,22 +46,25 @@ namespace Oldtimer.Api.Tests
                 Surname = "Doe",
             };
 
-            mediatorMock.Setup(x => x.Send(It.IsAny<AddSammlerCommand>(), It.IsAny<CancellationToken>()))
-                        .ReturnsAsync(neuerSammler);
+            var expectedValidationResult = new ValidationResult();
+
+            var validatorMock = new Mock<SammlerValidator>();
 
             mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<CancellationToken>()))
-                        .ReturnsAsync(neuerSammler); // Mock das Abrufen des Sammlers
+                        .ReturnsAsync(neuerSammler); 
 
             // Act
-            var result = await sutSammler.GetSammlerById(sammlerId);
+            var result = await sutSammler.CreateSammler(neuerSammler, validatorMock.Object);
 
             // Assert
+            validatorMock.Verify(x => x.ValidateAsync(neuerSammler, It.IsAny<CancellationToken>()), Times.Once);
+
             var objectResult = Assert.IsType<OkObjectResult>(result);
             // IsAssignableFrom<Sammler> prüft ob das Objekt vom Typ Sammler abgeleitet oder implementiert wird
             var addedSammler = Assert.IsAssignableFrom<Sammler>(objectResult.Value);
             Assert.Equal(sammlerId, addedSammler.Id);
         }
-
+        
 
 
         [Fact]
