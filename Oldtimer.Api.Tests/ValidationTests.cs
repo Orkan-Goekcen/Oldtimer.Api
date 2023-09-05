@@ -2,6 +2,7 @@
 using FluentValidation.TestHelper;
 using Oldtimer.Api.Data;
 using Oldtimer.Api.Validation;
+using Microsoft.AspNetCore.Routing;
 
 namespace Oldtimer.Api.Tests
 {
@@ -388,5 +389,161 @@ namespace Oldtimer.Api.Tests
             result.ShouldHaveValidationErrorFor(s => s.Telephone);
         }
 
+        public class SammlerDtoValidatorTests
+        {
+            private readonly SammlerDtoValidator _sammlerDtoValidator;
+
+            public SammlerDtoValidatorTests()
+            {
+                _sammlerDtoValidator = new SammlerDtoValidator();
+            }
+
+            [Fact]
+            public void Should_Not_Have_Error_When_Surname_Is_Valid()
+            {
+                var sammlerDto = new SammlerDto { Surname = "ValidSurname" };
+                var result = _sammlerDtoValidator.TestValidate(sammlerDto);
+                result.ShouldNotHaveValidationErrorFor(s => s.Surname);
+            }
+
+            [Fact]
+            public void Should_Have_Error_When_Surname_Is_Empty()
+            {
+                var sammlerDto = new SammlerDto { Surname = "" };
+                var result = _sammlerDtoValidator.TestValidate(sammlerDto);
+                result.ShouldHaveValidationErrorFor(s => s.Surname)
+                    .WithErrorMessage("Surname is required.");
+            }
+
+            [Fact]
+            public void Should_Have_Error_When_Surname_Exceeds_Maximum_Length()
+            {
+                var sammlerDto = new SammlerDto { Surname = new string('A', 26) };
+                var result = _sammlerDtoValidator.TestValidate(sammlerDto);
+                result.ShouldHaveValidationErrorFor(s => s.Surname)
+                    .WithErrorMessage("Surname cannot exceed 25 characters.");
+            }
+
+            [Fact]
+            public void Should_Not_Have_Error_When_Firstname_Is_Valid()
+            {
+                var sammlerDto = new SammlerDto { Firstname = "ValidFirstname" };
+                var result = _sammlerDtoValidator.TestValidate(sammlerDto);
+                result.ShouldNotHaveValidationErrorFor(s => s.Firstname);
+            }
+
+            [Fact]
+            public void Should_Have_Error_When_Firstname_Is_Empty()
+            {
+                var sammlerDto = new SammlerDto { Firstname = "" };
+                var result = _sammlerDtoValidator.TestValidate(sammlerDto);
+                result.ShouldHaveValidationErrorFor(s => s.Firstname)
+                    .WithErrorMessage("Firstname is required.");
+            }
+
+            [Fact]
+            public void Should_Have_Error_When_Firstname_Exceeds_Maximum_Length()
+            {
+                var sammlerDto = new SammlerDto { Firstname = new string('A', 26) };
+                var result = _sammlerDtoValidator.TestValidate(sammlerDto);
+                result.ShouldHaveValidationErrorFor(s => s.Firstname)
+                    .WithErrorMessage("Firstname cannot exceed 25 characters.");
+            }
+
+            [Fact]
+            public void Should_Not_Have_Error_When_Nickname_Is_Valid()
+            {
+                var sammlerDto = new SammlerDto { Nickname = "ValidNickname" };
+                var result = _sammlerDtoValidator.TestValidate(sammlerDto);
+                result.ShouldNotHaveValidationErrorFor(s => s.Nickname);
+            }
+
+            [Fact]
+            public void Should_Have_Error_When_Nickname_Exceeds_Maximum_Length()
+            {
+                var sammlerDto = new SammlerDto { Nickname = new string('A', 26) };
+                var result = _sammlerDtoValidator.TestValidate(sammlerDto);
+                result.ShouldHaveValidationErrorFor(s => s.Nickname)
+                    .WithErrorMessage("Nickname cannot exceed 25 characters.");
+            }
+
+            [Fact]
+            public void Should_Not_Have_Error_When_Birthdate_Is_Valid()
+            {
+                var sammlerDto = new SammlerDto { Birthdate = DateTime.Now.AddYears(-30) };
+                var result = _sammlerDtoValidator.TestValidate(sammlerDto);
+                result.ShouldNotHaveValidationErrorFor(s => s.Birthdate);
+            }
+
+            [Fact]
+            public void Should_Have_Error_When_Birthdate_Is_Empty()
+            {
+                var sammlerDto = new SammlerDto { Birthdate = default(DateTime) };
+                var result = _sammlerDtoValidator.TestValidate(sammlerDto);
+                result.ShouldHaveValidationErrorFor(s => s.Birthdate)
+                    .WithErrorMessage("Birthdate is required.");
+            }
+
+            [Fact]
+            public void Should_Have_Error_When_Birthdate_Is_In_The_Future()
+            {
+                var sammlerDto = new SammlerDto { Birthdate = DateTime.Now.AddYears(1) };
+                var result = _sammlerDtoValidator.TestValidate(sammlerDto);
+                result.ShouldHaveValidationErrorFor(s => s.Birthdate)
+                    .WithErrorMessage("Invalid birthdate.");
+            }
+
+            [Fact]
+            public void Should_Not_Have_Error_When_Email_Is_Valid()
+            {
+                var sammlerDto = new SammlerDto { Email = "valid.email@example.com" };
+                var result = _sammlerDtoValidator.TestValidate(sammlerDto);
+                result.ShouldNotHaveValidationErrorFor(s => s.Email);
+            }
+
+            [Fact]
+            public void Should_Have_Error_When_Email_Is_Empty()
+            {
+                var sammlerDto = new SammlerDto { Email = "" };
+                var result = _sammlerDtoValidator.TestValidate(sammlerDto);
+                result.ShouldHaveValidationErrorFor(s => s.Email)
+                    .WithErrorMessage("Email is required.");
+            }
+
+            [Fact]
+            public void Should_Have_Error_When_Email_Has_Invalid_Format()
+            {
+                var sammlerDto = new SammlerDto { Email = "invalid-email" };
+                var result = _sammlerDtoValidator.TestValidate(sammlerDto);
+                result.ShouldHaveValidationErrorFor(s => s.Email)
+                    .WithErrorMessage("Invalid email format.");
+            }
+
+            [Fact]
+            public void Should_Not_Have_Error_When_Telephone_Is_Valid()
+            {
+                var sammlerDto = new SammlerDto { Telephone = "1234567890" };
+                var result = _sammlerDtoValidator.TestValidate(sammlerDto);
+                result.ShouldNotHaveValidationErrorFor(s => s.Telephone);
+            }
+
+            [Fact]
+            public void Should_Have_Error_When_Telephone_Is_Empty()
+            {
+                var sammlerDto = new SammlerDto { Telephone = "" };
+                var result = _sammlerDtoValidator.TestValidate(sammlerDto);
+                result.ShouldHaveValidationErrorFor(s => s.Telephone)
+                    .WithErrorMessage("Telephone is required.");
+            }
+
+            [Fact]
+            public void Should_Have_Error_When_Telephone_Exceeds_Maximum_Length()
+            {
+                var sammlerDto = new SammlerDto { Telephone = new string('A', 36) };
+                var result = _sammlerDtoValidator.TestValidate(sammlerDto);
+                result.ShouldHaveValidationErrorFor(s => s.Telephone)
+                    .WithErrorMessage("Telephone cannot exceed 35 characters.");
+            }
+        }
     }
 }
