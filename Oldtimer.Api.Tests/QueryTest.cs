@@ -292,5 +292,43 @@ namespace Oldtimer.Api.Tests
             Assert.Equal($"No Sammler found with the Telephone number: 123456789", notFoundResult.Value);
         }
 
+        [Fact]
+        public async Task GetSammlerDetails_Returns_OkResult_With_Valid_Id()
+        {
+            // Arrange
+            long sammlerId = 1;
+            var sammler = TestData.GetSammlersTestData().FirstOrDefault(s => s.Id == sammlerId);
+            var cars = TestData.GetCarsTestData().Where(c => c.Sammler.Id == sammlerId).ToList();
+
+            mediatorMock.Setup(x => x.Send(It.IsAny<SammlerDetailsQuery>(), It.IsAny<CancellationToken>()))
+                        .ReturnsAsync(new SammlerDetailsResponse { Sammler = sammler, Oldtimer = cars });
+
+            // Act
+            var result = await sutSammler.GetSammlerDetails(sammlerId);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var model = Assert.IsType<SammlerDetailsResponse>(okResult.Value);
+            Assert.Equal(sammlerId, model.Sammler.Id);
+            Assert.Equal(sammler.Surname, model.Sammler.Surname);
+            Assert.Equal(sammler.Firstname, model.Sammler.Firstname);
+            Assert.Equal(cars.Count, model.Oldtimer.Count);
+        }
+
+        [Fact]
+        public async Task GetSammlerDetails_Returns_NotFound_With_Invalid_Id()
+        {
+            // Arrange
+            long invalidSammlerId = 999; // Beispiel für eine ungültige ID
+            mediatorMock.Setup(x => x.Send(It.IsAny<SammlerDetailsQuery>(), It.IsAny<CancellationToken>()))
+                        .ReturnsAsync((SammlerDetailsResponse)null); // null zurückgeben, um den nicht gefundenen Sammler zu simulieren
+
+            // Act
+            var result = await sutSammler.GetSammlerDetails(invalidSammlerId);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
     }
 }

@@ -109,30 +109,15 @@ namespace Oldtimer.Api.Controller
         [SwaggerOperation("Get Sammler Details by ID")]
         public async Task<ActionResult> GetSammlerDetails(long id)
         {
-            var query = new GetSammlerByIdQuery { SammlerId = id };
-            var sammler = await mediator.Send(query);
+            var query = new SammlerDetailsQuery { SammlerId = id };
+            var result = await mediator.Send(query);
 
-            if (sammler == null)
+            if (result == null)
             {
                 return NotFound();
             }
-            var oldtimerBySammlerId = new GetOldtimerBySammlerIdQuery { SammlerId = id };
-            var oldtimer = await mediator.Send(oldtimerBySammlerId);
 
-            // Extrahierte Infos über den Sammler für den Request Body
-            var sammlerInfo = new
-            {
-                Id = sammler.Id,
-                Surname = $"{sammler.Surname}",
-                Firstname = $"{sammler.Firstname}",
-            };
-
-            var sammlerDetails = new
-            {
-                Sammler = sammlerInfo,
-                Oldtimer = oldtimer
-            };
-            return Ok(sammlerDetails);
+            return Ok(result);
         }
 
         [HttpPost]
