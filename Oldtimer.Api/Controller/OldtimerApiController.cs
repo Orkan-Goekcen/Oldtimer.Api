@@ -87,7 +87,7 @@ namespace Oldtimer.Api.Controller
             }
 
             var addOldtimerToSammlerCommand = new AddOldtimerToSammlerCommand { SammlerId = id, CarDto = carDto };
-            var addedOldtimer = await mediator.Send(addOldtimerToSammlerCommand);
+            await mediator.Send(addOldtimerToSammlerCommand);
 
             return Ok();
         }

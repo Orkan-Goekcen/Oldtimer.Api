@@ -38,33 +38,70 @@ namespace Oldtimer.Api.Tests
         public async Task AddSammlerCommandQuery_fügt_Sammler_hinzu()
         {
             // Arrange
-            var sammlerId = 5;
-            var neuerSammler = new Sammler
+            var neuerSammlerDto = new SammlerDto
             {
-                Id = sammlerId,
                 Firstname = "John",
                 Surname = "Doe",
+                Nickname = "JD",
+                Email = "John.Doe@gmail.com",
+                Telephone = "1112222333",
+                Birthdate = new DateTime(1999, 2, 12),
             };
 
             var expectedValidationResult = new ValidationResult();
 
-            var validatorMock = new Mock<SammlerValidator>();
+            var validatorMock = new Mock<IValidator<SammlerDto>>();
+            validatorMock
+                .Setup(x => x.ValidateAsync(neuerSammlerDto, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(expectedValidationResult);
 
             mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<CancellationToken>()))
-                        .ReturnsAsync(neuerSammler); 
+                        .ReturnsAsync(new Sammler()); // Da die Methode CreateSammler in SammlerApiController ein Sammler-Objekt zurückgibt
 
             // Act
-            var result = await sutSammler.CreateSammler(neuerSammler, validatorMock.Object);
+            var result = await sutSammler.CreateSammler(neuerSammlerDto, validatorMock.Object);
 
             // Assert
-            validatorMock.Verify(x => x.ValidateAsync(neuerSammler, It.IsAny<CancellationToken>()), Times.Once);
-
-            var objectResult = Assert.IsType<OkObjectResult>(result);
-            // IsAssignableFrom<Sammler> prüft ob das Objekt vom Typ Sammler abgeleitet oder implementiert wird
-            var addedSammler = Assert.IsAssignableFrom<Sammler>(objectResult.Value);
-            Assert.Equal(sammlerId, addedSammler.Id);
+            Assert.IsType<ActionResult<Sammler>>(result);
         }
-        
+
+
+        [Fact]
+        public async Task AddSammler_Conflict_When_Sammler_Already_Exists()
+        {
+            // Arrange
+            var neuerSammlerDto = new SammlerDto
+            {
+                Firstname = "John",
+                Surname = "Doe",
+                Nickname = "JD",
+                Email = "John.Doe@gmail.com",
+                Telephone = "1112222333",
+                Birthdate = new DateTime(1999, 2, 12),
+            };
+
+            var sammlerBereitsVorhanden = true;
+            mediatorMock.Setup(x => x.Send(It.IsAny<SammlerVorhandenQuery>(), It.IsAny<CancellationToken>()))
+                        .ReturnsAsync(sammlerBereitsVorhanden);
+
+            // Erstellen Sie ein Mock-Objekt für den Sammler-Validator.
+            var validatorMock = new Mock<IValidator<SammlerDto>>();
+            validatorMock
+                .Setup(x => x.ValidateAsync(neuerSammlerDto, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            // Act
+            var result = await sutSammler.CreateSammler(neuerSammlerDto, validatorMock.Object);
+
+            // Assert
+            var conflictResult = Assert.IsType<ActionResult<Sammler>>(result);
+            Assert.IsType<ConflictObjectResult>(conflictResult.Result);
+            var conflictObjectResult = conflictResult.Result as ConflictObjectResult;
+
+            var konfliktSammler = Assert.IsType<Sammler>(conflictObjectResult.Value);
+            Assert.Equal(neuerSammlerDto.Firstname, konfliktSammler.Firstname);
+            Assert.Equal(neuerSammlerDto.Surname, konfliktSammler.Surname);
+        }
 
 
         [Fact]

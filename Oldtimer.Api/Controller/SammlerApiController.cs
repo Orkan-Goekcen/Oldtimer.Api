@@ -137,12 +137,23 @@ namespace Oldtimer.Api.Controller
 
         [HttpPost]
         [SwaggerOperation("Create Sammler")]
-        public async Task<ActionResult<Sammler>> CreateSammler([FromBody] Sammler neuerSammler, [FromServices] IValidator<Sammler> validator)
+        public async Task<ActionResult<Sammler>> CreateSammler([FromBody] SammlerDto neuerSammlerDto, [FromServices] IValidator<SammlerDto> validator)
         {
+            // Wandeln Sie das SammlerDto in ein Sammler-Objekt um.
+            var neuerSammler = new Sammler
+            {
+                Surname = neuerSammlerDto.Surname,
+                Firstname = neuerSammlerDto.Firstname,
+                Nickname = neuerSammlerDto.Nickname,
+                Birthdate = neuerSammlerDto.Birthdate,
+                Email = neuerSammlerDto.Email,
+                Telephone = neuerSammlerDto.Telephone
+            };
+
             var query = new SammlerVorhandenQuery { NeuerSammler = neuerSammler };
             var sammlerBereitsVorhanden = await mediator.Send(query);
 
-            var validationResult = await validator.ValidateAsync(neuerSammler);
+            var validationResult = await validator.ValidateAsync(neuerSammlerDto);
 
             if (!validationResult.IsValid)
             {
@@ -158,16 +169,11 @@ namespace Oldtimer.Api.Controller
                 var addSammlerCommand = new AddSammlerCommand { Sammler = neuerSammler };
                 var addedSammler = await mediator.Send(addSammlerCommand);
 
-                if (addedSammler != null)
-                {
-                    return Ok(addedSammler);
-                }
-                else
-                {
-                    return BadRequest("Sammler Not Found.");
-                }
+                return Ok(addedSammler);
             }
         }
+
+
 
         [HttpDelete("{id}")]
         [SwaggerOperation("Delete Sammler by ID")]
