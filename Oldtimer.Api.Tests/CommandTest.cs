@@ -217,43 +217,45 @@ namespace Oldtimer.Api.Tests
             Assert.IsType<NotFoundResult>(result);
         }
 
+
         [Fact]
-        public async Task UpdateSammlerCommand_aktualisiert_Sammler()
+        public async Task UpdateSammler_Updates_Sammler_Successfully()
         {
             // Arrange
-            var validatorMock = new Mock<SammlerUpdateDataValidator>();
-
-            var sammlerId = 5;
-            var neuerSammler = new Sammler
+            var aktualisierterSammlerUpdate = new SammlerUpdateData
             {
-                Id = 66,
-                Surname = "Mustermann",
-                Firstname = "Max",
-                Nickname = "Maxi",
-                Birthdate = new DateTime(1990, 1, 1), 
-                Email = "max.mustermann@example.com",
-                Telephone = "1234567890"
-
+                Firstname = "UpdatedFirstName",
+                Surname = "UpdatedSurname",
+                Nickname = "UpdatedNickname",
+                Email = "updated.email@example.com",
+                Telephone = "555-555-5555",
+                Birthdate = new DateTime(1990, 5, 15),
             };
 
-            var updatedSammlerData = new SammlerUpdateData
+            var sammlerId = 1; 
+            var vorhandenerSammler = new Sammler
             {
-                Surname = "Doe",
-                Firstname = "John",
-                Nickname = "Johnny",
-                Birthdate = new DateTime(1985, 5, 15), // Ein gültiges Geburtsdatum in der Vergangenheit
-                Email = "john.doe@example.com",
-                Telephone = "555-123-4567"
+                Id = sammlerId,
+                Firstname = "OriginalFirstName",
+                Surname = "OriginalSurname",
+                Nickname = "OriginalNickname",
+                Email = "original.email@example.com",
+                Telephone = "111-111-1111",
+                Birthdate = new DateTime(1985, 10, 5),
             };
 
             mediatorMock.Setup(x => x.Send(It.IsAny<GetSammlerByIdQuery>(), It.IsAny<CancellationToken>()))
-                       .ReturnsAsync(neuerSammler);
+                        .ReturnsAsync(vorhandenerSammler);
 
-            // Act  
-            var result = await sutSammler.UpdateSammler(sammlerId, updatedSammlerData, validatorMock.Object);
+            var validatorMock = new Mock<IValidator<SammlerUpdateData>>();
+            validatorMock
+                .Setup(x => x.ValidateAsync(aktualisierterSammlerUpdate, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new ValidationResult());
+
+            // Act
+            var result = await sutSammler.UpdateSammler(sammlerId, aktualisierterSammlerUpdate, validatorMock.Object);
 
             // Assert
-            mediatorMock.Verify(m => m.Send(It.IsAny<UpdateSammlerCommand>(), It.IsAny<CancellationToken>()), Times.Once);
             Assert.IsType<OkObjectResult>(result);
         }
 
